@@ -9,143 +9,103 @@ metadata:
 
 # Documentation Contents Generator
 
-Generate well-structured project documentation that helps both humans and AI agents navigate your codebase.
+Generate CONTENTS.md and AGENTS.md files for project navigation and AI agent context.
 
-## Capabilities
+## CONTENTS.md
 
-1. **CONTENTS.md** - Navigation indexes for directories
-2. **AGENTS.md** - AI agent instructions and context
-3. **README sections** - Module/package documentation
+A simple table listing files and directories with brief descriptions.
 
-## When to Use
+- **Format:** Table with Name and Description columns
+- **Descriptions:** 1-2 sentences max
+- **Nesting:** Place in any directory that benefits from an index
 
-- Setting up a new project
-- Reorganizing project structure
-- Onboarding new team members or AI agents
-- Creating navigation for complex directories
+See [assets/contents-template.md](assets/contents-template.md) for the template.
 
-## CONTENTS.md Generation
+## AGENTS.md
 
-CONTENTS.md files serve as navigation indexes, similar to a book's table of contents.
+Context for AI coding agents (Claude Code, Cursor, Codex, etc.).
 
-### Placement Strategy
+### Root AGENTS.md
 
-```
-project/
-├── CONTENTS.md          # Root: Project overview + top-level navigation
-├── src/
-│   ├── CONTENTS.md      # Source overview + module listing
-│   ├── components/
-│   │   └── CONTENTS.md  # Component catalog
-│   └── utils/
-│       └── CONTENTS.md  # Utility function index
-└── docs/
-    └── CONTENTS.md      # Documentation structure
-```
+Place at project root with:
+- Build commands
+- Code style conventions
+- Testing approach
+- Commit format
+- Available skills
 
-### Generation Process
+### Nested AGENTS.md
 
-1. **Scan directory** - List all files and subdirectories
-2. **Categorize** - Group by type (code, docs, config, tests)
-3. **Describe** - Add brief descriptions for each item
-4. **Link** - Create relative links for navigation
-5. **Format** - Use the template from [assets/contents-template.md](assets/contents-template.md)
+Place in subdirectories only when they have unique conventions not covered by the root file.
 
-### Template Reference
+**Critical:** Never repeat instructions from parent files. Only include directory-specific guidance.
 
-See [assets/contents-template.md](assets/contents-template.md) for the standard format.
+See [assets/agents-template.md](assets/agents-template.md) for the template.
 
-## AGENTS.md Generation
+## Generation Process
 
-AGENTS.md provides context for AI coding agents (Codex, Cursor, Claude Code, etc.).
-
-### Content Structure
-
-1. **Project Overview** - What the project does
-2. **Build Commands** - How to build, test, run
-3. **Code Style** - Conventions and patterns
-4. **Testing** - How to write and run tests
-5. **Available Skills** - If using agent-kit
-6. **Commit Guidelines** - PR and commit conventions
-
-### Generation Process
-
-1. **Detect project type** - Language, framework, build system
-2. **Extract commands** - From package.json, Makefile, etc.
+1. **Detect project type** - Parse package.json, pyproject.toml, go.mod, Cargo.toml, etc.
+2. **Extract commands** - Build, test, lint, dev commands
 3. **Infer conventions** - From existing code patterns
-4. **Compile context** - Merge all relevant information
-5. **Format** - Use the template from [assets/agents-template.md](assets/agents-template.md)
-
-### Template Reference
-
-See [assets/agents-template.md](assets/agents-template.md) for the standard format.
-
-## Language-Specific Behavior
-
-### Node.js / TypeScript
-- Parse `package.json` for scripts
-- Check for `tsconfig.json` patterns
-- Detect framework (React, Next.js, Express, etc.)
-
-### Python
-- Parse `pyproject.toml`, `setup.py`, `requirements.txt`
-- Check for framework markers (Django, Flask, FastAPI)
-- Detect test framework (pytest, unittest)
-
-### Go
-- Parse `go.mod` for module info
-- Check for `Makefile` commands
-- Detect project structure (cmd/, pkg/, internal/)
-
-### Rust
-- Parse `Cargo.toml` for crate info
-- Extract workspace structure if applicable
-
-### Generic
-- Look for `Makefile`, `justfile`, or similar
-- Check for CI configuration (.github/workflows/, etc.)
-- Parse any README.md for context
-
-## Output Locations
-
-| File | Location | Purpose |
-|------|----------|---------|
-| CONTENTS.md | Each significant directory | Navigation index |
-| AGENTS.md | Project root | AI agent context |
-| README updates | Module directories | Human documentation |
+4. **Apply template** - Use the appropriate template
 
 ## Examples
 
-### Example: Generate CONTENTS.md for src/
+### Generate CONTENTS.md
 
 ```
 User: Create a CONTENTS.md for the src directory
 
-Claude: [Scans src/ directory]
-[Reads assets/contents-template.md]
-[Generates CONTENTS.md with file listings and descriptions]
+Claude: [Scans src/, applies contents-template.md]
+
+# src
+
+| Name | Description |
+|------|-------------|
+| [index.ts](./index.ts) | Main entry point and exports. |
+| [cli.ts](./cli.ts) | Command-line interface handler. |
+| [utils/](./utils/) | Shared utility functions. |
 ```
 
-### Example: Generate AGENTS.md for project
+### Generate AGENTS.md
 
 ```
 User: Create an AGENTS.md for this project
 
-Claude: [Detects Node.js project from package.json]
-[Extracts scripts: dev, build, test, lint]
-[Reads assets/agents-template.md]
-[Generates AGENTS.md with project context]
+Claude: [Detects Node.js from package.json, extracts scripts]
+
+# AGENTS.md
+
+CLI tool for managing project documentation.
+
+## Build Commands
+
+bun install
+bun run build
+bun test
 ```
 
-## Integration with agent-kit
+## Validation
 
-If the project uses agent-kit, include:
-- Available skills list
-- Slash commands
-- Configuration from .ak/config.json
+Validate that CONTENTS.md files include all files:
 
-## Related Skills
+```bash
+bun run scripts/validate-contents.ts [path]
+```
 
-- `create-plan` - For implementation planning docs
-- `create-adr` - For architecture decision records
-- `brainstorm` - For design exploration docs
+Output (JSON):
+```json
+{
+  "valid": false,
+  "results": [
+    {
+      "contentsPath": "src/CONTENTS.md",
+      "missing": ["newfile.ts"],
+      "extra": ["deleted-file.ts"]
+    }
+  ]
+}
+```
+
+- `missing`: Files in directory but not in CONTENTS.md
+- `extra`: Links in CONTENTS.md that don't exist
