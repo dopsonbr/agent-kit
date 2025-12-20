@@ -139,6 +139,32 @@ ak init --preset-info codex  # Details about a specific preset
 | `review` | Focus on code review | review-plan, review-code |
 | `execution` | Focus on autonomous execution | create-plan, implement-plan, review-plan, review-code |
 
+#### Custom Presets
+
+Create custom presets in `.ak/config.json`:
+
+```jsonc
+{
+  "customPresets": {
+    "my-team": {
+      "extends": "standard",
+      "description": "Our team's preferred setup",
+      "addSkills": ["create-adr"],
+      "removeSkills": ["doc-contents"],
+      "defaults": {
+        "reviewTool": "claude",
+        "planExecutionMode": "checkpoint"
+      }
+    }
+  }
+}
+```
+
+Then use it:
+```bash
+ak init --preset my-team
+```
+
 Creates:
 - `.github/skills/` - Agent Skills for Copilot
 - `.claude/skills/` - Skills for Claude Code (symlinked)

@@ -308,3 +308,94 @@ export function listPresets(): Preset[] {
 export function getPresetNames(): string[] {
   return Object.keys(PRESETS);
 }
+
+/**
+ * Create a custom preset by extending an existing one
+ */
+export function createCustomPreset(
+  base: string,
+  overrides: Partial<Omit<Preset, "name">> & { name: string }
+): Preset {
+  const basePreset = getPreset(base);
+  if (!basePreset) {
+    throw new Error(`Unknown base preset: ${base}`);
+  }
+
+  return {
+    ...basePreset,
+    ...overrides,
+    targets: { ...basePreset.targets, ...overrides.targets },
+    defaults: { ...basePreset.defaults, ...overrides.defaults },
+    skills: overrides.skills || basePreset.skills,
+    commands: overrides.commands || basePreset.commands,
+    createDirs: overrides.createDirs || basePreset.createDirs,
+  };
+}
+
+/**
+ * Validate that all skills in a preset exist
+ */
+export function validatePreset(preset: Preset, availableSkills: string[]): string[] {
+  const missing: string[] = [];
+  for (const skill of preset.skills) {
+    if (!availableSkills.includes(skill)) {
+      missing.push(skill);
+    }
+  }
+  return missing;
+}
+
+/**
+ * Custom preset definition for .ak/config.json
+ */
+export interface CustomPresetConfig {
+  extends?: string;
+  name: string;
+  description: string;
+  skills?: string[];
+  addSkills?: string[];
+  removeSkills?: string[];
+  commands?: string[];
+  addCommands?: string[];
+  removeCommands?: string[];
+  targets?: Partial<Preset["targets"]>;
+  defaults?: Partial<Preset["defaults"]>;
+  createDirs?: string[];
+}
+
+/**
+ * Build a preset from custom config
+ */
+export function buildPresetFromConfig(config: CustomPresetConfig): Preset {
+  const base = config.extends ? getPreset(config.extends) : PRESETS.standard;
+  
+  if (!base) {
+    throw new Error(`Unknown base preset: ${config.extends}`);
+  }
+
+  let skills = config.skills || [...base.skills];
+  if (config.addSkills) {
+    skills = [...new Set([...skills, ...config.addSkills])];
+  }
+  if (config.removeSkills) {
+    skills = skills.filter(s => !config.removeSkills!.includes(s));
+  }
+
+  let commands = config.commands || [...base.commands];
+  if (config.addCommands) {
+    commands = [...new Set([...commands, ...config.addCommands])];
+  }
+  if (config.removeCommands) {
+    commands = commands.filter(c => !config.removeCommands!.includes(c));
+  }
+
+  return {
+    name: config.name,
+    description: config.description,
+    skills,
+    commands,
+    targets: { ...base.targets, ...config.targets },
+    defaults: { ...base.defaults, ...config.defaults },
+    createDirs: config.createDirs || base.createDirs,
+  };
+}
