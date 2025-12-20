@@ -2,6 +2,8 @@
  * Shared type definitions for agent-kit
  */
 
+export * from "./presets";
+
 export interface AkConfig {
   version: string;
   source: {

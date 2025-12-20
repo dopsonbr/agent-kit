@@ -81,6 +81,24 @@ This project uses its own skills for development:
 - **review-code** - Review code changes
 - **doc-contents** - Generate documentation
 
+## Presets
+
+agent-kit supports presets for different project needs:
+
+| Preset | Use Case |
+|--------|----------|
+| `standard` | Most projects (default) |
+| `full` | Everything included |
+| `minimal` | Just AGENTS.md |
+| `claude` | Claude Code focused |
+| `copilot` | GitHub Copilot focused |
+| `codex` | OpenAI Codex focused |
+| `planning` | Architecture/design work |
+| `review` | Code review workflows |
+| `execution` | Autonomous implementation |
+
+See `src/types/presets.ts` for preset definitions.
+
 ## Development Workflow
 
 1. Use `/brainstorm` to explore new features

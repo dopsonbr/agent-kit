@@ -116,12 +116,28 @@ ak delegate review-code --tool claude --mode uncommitted
 Initialize agent-kit in your project:
 
 ```bash
-ak init                    # Interactive setup
-ak init --yes              # Accept all defaults
-ak init --skip-agents-md   # Don't create AGENTS.md
-ak init --claude-only      # Only set up Claude Code
-ak init --copilot-only     # Only set up GitHub Copilot
+ak init                      # Interactive setup with standard preset
+ak init --preset full        # Install everything
+ak init --preset minimal     # Lightweight setup
+ak init --preset claude      # Optimized for Claude Code
+ak init --yes                # Skip confirmation prompts
+ak init --list-presets       # Show all available presets
+ak init --preset-info codex  # Details about a specific preset
 ```
+
+#### Available Presets
+
+| Preset | Description | Skills |
+|--------|-------------|--------|
+| `standard` | Recommended core skills (default) | brainstorm, create-plan, implement-plan, review-code, doc-contents |
+| `full` | Complete setup with all skills | All 7 skills |
+| `minimal` | Lightweight AGENTS.md only | brainstorm, doc-contents |
+| `claude` | Optimized for Claude Code | All skills, Claude delegation |
+| `copilot` | Optimized for GitHub Copilot | Core skills, .github/skills/ focus |
+| `codex` | Optimized for OpenAI Codex | All skills, Codex delegation |
+| `planning` | Focus on ideation and docs | brainstorm, create-plan, create-adr, doc-contents |
+| `review` | Focus on code review | review-plan, review-code |
+| `execution` | Focus on autonomous execution | create-plan, implement-plan, review-plan, review-code |
 
 Creates:
 - `.github/skills/` - Agent Skills for Copilot

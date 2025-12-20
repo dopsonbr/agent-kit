@@ -10,10 +10,10 @@ const COMMANDS = {
   init: {
     description: "Initialize agent-kit in your project",
     flags: {
-      "--yes, -y": "Accept all defaults",
-      "--skip-agents-md": "Don't create AGENTS.md",
-      "--claude-only": "Only set up Claude Code",
-      "--copilot-only": "Only set up GitHub Copilot",
+      "--preset <name>": "Use a preset (standard, full, minimal, claude, copilot, codex, planning, review, execution)",
+      "--list-presets": "Show all available presets with details",
+      "--preset-info <name>": "Show detailed info about a specific preset",
+      "--yes, -y": "Accept all defaults without prompting",
       "--force": "Reinitialize even if already set up",
     },
   },
