@@ -80,6 +80,7 @@ This project uses its own skills for development:
 - **review-plan** - Review plans before execution
 - **review-code** - Review code changes
 - **doc-contents** - Generate documentation
+- **skill-creator** - Create new Agent Skills with best practices
 
 ## Presets
 

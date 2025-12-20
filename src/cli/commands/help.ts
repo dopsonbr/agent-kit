@@ -47,6 +47,7 @@ const SKILLS = [
   { name: "review-plan", desc: "Review plans before execution" },
   { name: "review-code", desc: "Review code changes with high reasoning" },
   { name: "doc-contents", desc: "Generate project documentation" },
+  { name: "skill-creator", desc: "Create new Agent Skills with best practices" },
 ];
 
 export function helpCommand(args: string[]): void {

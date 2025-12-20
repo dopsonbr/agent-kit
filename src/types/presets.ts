@@ -36,6 +36,7 @@ export const PRESETS: Record<string, Preset> = {
       "review-plan",
       "review-code",
       "doc-contents",
+      "skill-creator",
     ],
     commands: [
       "brainstorm",
@@ -45,6 +46,7 @@ export const PRESETS: Record<string, Preset> = {
       "review-plan",
       "review-code",
       "doc-contents",
+      "create-skill",
     ],
     targets: {
       claude: true,
@@ -126,6 +128,7 @@ export const PRESETS: Record<string, Preset> = {
       "review-plan",
       "review-code",
       "doc-contents",
+      "skill-creator",
     ],
     commands: [
       "brainstorm",
@@ -135,6 +138,7 @@ export const PRESETS: Record<string, Preset> = {
       "review-plan",
       "review-code",
       "doc-contents",
+      "create-skill",
     ],
     targets: {
       claude: true,

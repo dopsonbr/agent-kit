@@ -108,6 +108,7 @@ ak delegate review-code --tool claude --mode uncommitted
 | `review-plan` | Review plans before execution |
 | `review-code` | Review code changes with high reasoning |
 | `doc-contents` | Generate project documentation |
+| `skill-creator` | Create new Agent Skills with best practices |
 
 ## Commands
 
@@ -130,9 +131,9 @@ ak init --preset-info codex  # Details about a specific preset
 | Preset | Description | Skills |
 |--------|-------------|--------|
 | `standard` | Recommended core skills (default) | brainstorm, create-plan, implement-plan, review-code, doc-contents |
-| `full` | Complete setup with all skills | All 7 skills |
+| `full` | Complete setup with all skills | All 8 skills including skill-creator |
 | `minimal` | Lightweight AGENTS.md only | brainstorm, doc-contents |
-| `claude` | Optimized for Claude Code | All skills, Claude delegation |
+| `claude` | Optimized for Claude Code | All 8 skills, Claude delegation |
 | `copilot` | Optimized for GitHub Copilot | Core skills, .github/skills/ focus |
 | `codex` | Optimized for OpenAI Codex | All skills, Codex delegation |
 | `planning` | Focus on ideation and docs | brainstorm, create-plan, create-adr, doc-contents |
