@@ -1,0 +1,72 @@
+{
+  "name": "agent-kit",
+  "version": "0.1.0",
+  "description": "CLI for managing AI coding agent configurations",
+  "type": "module",
+  "bin": {
+    "ak": "./dist/cli/index.js"
+  },
+  "main": "./dist/lib/index.js",
+  "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/lib/index.js"
+    },
+    "./cli": {
+      "types": "./dist/cli/index.d.ts",
+      "import": "./dist/cli/index.js"
+    }
+  },
+  "scripts": {
+    "dev": "bun run --watch src/cli/index.ts",
+    "build": "bun build src/cli/index.ts --outdir dist/cli --target node && bun build src/lib/index.ts --outdir dist/lib --target node",
+    "test": "bun test",
+    "test:watch": "bun test --watch",
+    "test:coverage": "bun test --coverage",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "bun run build",
+    "ak": "bun run src/cli/index.ts"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "agents",
+    "claude",
+    "copilot",
+    "codex",
+    "skills",
+    "agent-skills",
+    "agents-md"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YOUR_ORG/agent-kit.git"
+  },
+  "homepage": "https://github.com/YOUR_ORG/agent-kit#readme",
+  "bugs": {
+    "url": "https://github.com/YOUR_ORG/agent-kit/issues"
+  },
+  "files": [
+    "dist",
+    "content",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "bun@1.0.0"
+}
