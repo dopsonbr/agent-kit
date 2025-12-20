@@ -302,25 +302,40 @@ Generated automatically with sensible defaults:
 
 ## Architecture
 
+### Skill Structure
+
+Each skill is self-contained with bundled resources, following the [Agent Skills specification](https://agentskills.io):
+
+```
+content/skills/{skill-name}/
+├── SKILL.md           # Main instructions (Level 2)
+├── assets/            # Templates, data files
+│   ├── template.md    # Document templates
+│   └── example.json   # Example data
+├── references/        # Additional docs (Level 3)
+│   └── advanced.md    # Loaded on-demand
+└── scripts/           # Executable code
+    └── generate.py    # Deterministic operations
+```
+
+**Progressive Loading:**
+1. **Level 1** (startup): Only `name` and `description` loaded
+2. **Level 2** (triggered): Full SKILL.md body
+3. **Level 3** (as-needed): assets/, references/, scripts/
+
 ### Compatibility Strategy
 
 agent-kit generates configurations for multiple formats:
 
 ```
-agent-kit repo
-     │
-     ├── content/
-     │   ├── skills/           # Canonical SKILL.md files
-     │   ├── commands/         # Claude slash commands
-     │   ├── standards/        # Shared standards
-     │   └── templates/        # Document templates
+content/skills/           # Canonical skill definitions
      │
      └── generates →
              │
-             ├── .github/skills/    # Agent Skills format
+             ├── .github/skills/    # Agent Skills format (Copilot, VS Code)
              ├── .claude/skills/    # Claude Code (symlinks)
              ├── .claude/commands/  # Claude slash commands
-             └── AGENTS.md          # Combined instructions
+             └── AGENTS.md          # Combined instructions (Codex, Cursor)
 ```
 
 ### Skill Format
@@ -407,20 +422,21 @@ agent-kit/
 │       ├── generator.ts     # Format generators
 │       └── config.ts        # Configuration handling
 ├── content/
-│   ├── skills/              # SKILL.md files
-│   ├── commands/            # Command definitions
-│   ├── standards/           # Standards documents
-│   └── templates/           # Document templates
+│   ├── skills/              # Self-contained skill directories
+│   │   ├── {skill-name}/
+│   │   │   ├── SKILL.md     # Main instructions
+│   │   │   ├── assets/      # Templates, data
+│   │   │   ├── references/  # Additional docs
+│   │   │   └── scripts/     # Executable code
+│   │   └── ...
+│   └── commands/            # Slash command definitions
 ├── docs/
 │   ├── plans/               # Implementation plans
 │   └── adrs/                # Architecture decisions
 ├── tests/
 ├── package.json
-├── bunfig.toml
 ├── AGENTS.md                # For developing agent-kit
-├── .claude/                 # Claude Code config
-└── .github/
-    └── skills/              # Symlinked for self-use
+└── .claude/                 # Claude Code config
 ```
 
 ## Roadmap
