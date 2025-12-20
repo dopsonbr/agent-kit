@@ -453,14 +453,30 @@ agent-kit/
 
 ## Contributing
 
-Contributions welcome! Use the included skills:
+This project dogfoods its own skills. The `.claude/` directory symlinks to `content/`:
 
-1. `/brainstorm` your idea
-2. `/create-plan` for implementation
-3. `/implement-plan` to execute
-4. `/review-code` before PR
+```bash
+.claude/skills/   → content/skills/
+.claude/commands/ → content/commands/
+```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+### Development Workflow
+
+1. Clone and install: `bun install`
+2. Symlinks are already set up - skills work immediately
+3. Use `/create-skill` to add new skills
+4. Use `/create-plan` to plan features
+5. Changes to `content/skills/` are live (no reinstall needed)
+
+### Using the Skills
+
+```
+/create-skill          # Create a new skill
+/create-plan           # Plan a feature or fix
+/brainstorm            # Explore ideas (when skill exists)
+```
+
+See [AGENTS.md](AGENTS.md) for full development instructions.
 
 ## License
 

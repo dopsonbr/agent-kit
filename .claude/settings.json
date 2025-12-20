@@ -1,0 +1,21 @@
+{
+  "$schema": "https://claude.ai/schemas/claude-settings.json",
+  "agent-kit": {
+    "version": "0.1.0",
+    "mode": "development",
+    "dogfooding": true
+  },
+  "permissions": {
+    "allow_file_creation": true,
+    "allow_file_edit": true,
+    "allow_bash": true
+  },
+  "skills": {
+    "enabled": true,
+    "path": ".claude/skills"
+  },
+  "commands": {
+    "enabled": true,
+    "path": ".claude/commands"
+  }
+}

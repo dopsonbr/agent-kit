@@ -6,6 +6,31 @@ This is **agent-kit** - a CLI for managing AI coding agent configurations.
 
 agent-kit (`ak`) is a Bun-based CLI tool distributed via npm. It fetches skills, commands, templates, and standards from its GitHub repository and installs them locally in projects. It supports multiple AI coding agents including Claude Code, GitHub Copilot, and OpenAI Codex.
 
+## Dogfooding Setup
+
+This project uses its own skills for development via symlinks:
+
+```
+.claude/skills/   → content/skills/   (symlink)
+.claude/commands/ → content/commands/ (symlink)
+```
+
+**This means:**
+- Skills in `content/skills/` are immediately available to Claude Code
+- Changes to skills take effect without reinstallation
+- Use `/create-skill` to create new skills
+- Use `/create-plan` to plan new features
+
+**Available commands:**
+- `/create-skill` - Create a new Agent Skill
+- `/create-plan` - Create an implementation plan (when skill exists)
+
+**To verify setup:**
+```bash
+ls -la .claude/
+# Should show symlinks to content/
+```
+
 ## Build Commands
 
 ```bash
