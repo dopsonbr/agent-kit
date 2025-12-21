@@ -4,7 +4,7 @@ description: Create detailed implementation plans with diagrams and dependency g
 license: MIT
 metadata:
   author: agent-kit
-  version: "2.0.0"
+  version: "2.1.0"
 ---
 
 # Create Implementation Plan
@@ -207,7 +207,37 @@ Run the validation script:
 bun run content/skills/create-plan/scripts/validate-plan.ts docs/plans/{plan-file}.md
 ```
 
-### Phase 10: Offer Worktree Setup
+### Phase 10: Commit Plan
+
+After validation passes, commit the plan and any related artifacts:
+
+```bash
+git add docs/plans/{plan-file}.md
+git add docs/plans/{plan-file}*.md  # Include any subplans
+git commit -m "docs(plan): add {NNNN}_{FEATURE_NAME}
+
+- {Brief description of what the plan covers}
+- Includes dependency graph and testing strategy
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+```
+
+Always commit immediately after validation to ensure plans are tracked in version control.
+
+### Phase 11: Offer Review
+
+After committing, ask:
+> "Would you like me to run `/review-plan` to validate this plan before implementation?"
+
+The review-plan skill will:
+- Check for completeness and clarity
+- Validate dependencies are correct
+- Ensure testing strategy is adequate
+- Identify potential issues or gaps
+
+### Phase 12: Offer Worktree Setup
 
 After plan is complete, ask:
 > "Would you like me to create a git worktree for implementing this plan?"
