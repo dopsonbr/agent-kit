@@ -1,6 +1,6 @@
 # 0001_bootstrap
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 
 ---
 
@@ -94,7 +94,7 @@ graph TD
 **Prereqs:** Phase 1 complete
 **Blockers:** None
 
-**Status:** PENDING
+**Status:** COMPLETE
 
 ### 2.1 Replace ESLint/Prettier with oxc
 
@@ -212,7 +212,7 @@ All dogfooding setup complete.
 **Prereqs:** Source structure complete
 **Blockers:** None
 
-**Status:** PENDING
+**Status:** COMPLETE
 
 ### 5.1 Create Test Structure and High-Value Tests
 
@@ -353,12 +353,12 @@ graph TD
 ## Checklist
 
 - [x] Phase 1 complete (project config)
-- [ ] Phase 2 complete (oxc setup)
+- [x] Phase 2 complete (oxc setup)
 - [x] Phase 3 complete (source structure)
 - [x] Phase 4 complete (self-hosting)
-- [ ] Phase 5 complete (testing)
-- [ ] All tests passing
-- [ ] Linting passing
+- [x] Phase 5 complete (testing)
+- [x] All tests passing
+- [x] Linting passing
 
 ---
 
