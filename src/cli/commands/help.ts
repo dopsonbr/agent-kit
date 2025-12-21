@@ -13,6 +13,7 @@ const COMMANDS = {
       "--preset <name>": "Use a preset (standard, full, minimal, claude, copilot, codex, planning, review, execution)",
       "--list-presets": "Show all available presets with details",
       "--preset-info <name>": "Show detailed info about a specific preset",
+      "--local": "Use local content/ directory instead of GitHub (for development)",
       "--yes, -y": "Accept all defaults without prompting",
       "--force": "Reinitialize even if already set up",
     },
