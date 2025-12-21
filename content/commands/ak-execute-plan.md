@@ -21,9 +21,10 @@ Key steps:
 5. Execute phases using subagent delegation
 6. After EACH phase, invoke review-implementation for checkpoint
 7. Apply review feedback critically (evaluate, don't blindly apply)
-8. After ALL phases complete, invoke review-implementation for final review
-9. Generate execution report
-10. Invoke merge-archive-plan (prompt if on main, skip if on feature branch)
+8. Verify ALL tasks complete - STOP if incomplete and ask user for guidance
+9. After ALL phases complete, invoke review-implementation for final review
+10. Generate execution report
+11. Invoke merge-archive-plan (prompt if on main, skip if on feature branch)
 
 Use the references from:
 - @skills/plan-execute/references/subagent-patterns.md - For subagent coordination patterns

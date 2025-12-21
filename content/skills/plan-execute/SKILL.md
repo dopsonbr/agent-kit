@@ -258,7 +258,57 @@ bun run lint
 bun run build  # if applicable
 ```
 
-### Step 2: Mandatory Final Review
+### Step 2: Verify All Tasks Complete
+
+**REQUIRED:** Before proceeding, verify every task in the plan is complete.
+
+Scan the plan for:
+1. **Phase tasks** - All `### X.Y {Task Name}` sections
+2. **Checklist items** - All `- [ ]` items in the Checklist section
+3. **Files Summary** - All CREATE/MODIFY/DELETE actions
+
+For each item, verify:
+- Task was executed
+- Verification command passed
+- Expected files exist/changed
+
+**If incomplete items found:**
+
+```markdown
+## Incomplete Tasks Detected
+
+The following items in the plan are not yet complete:
+
+### Incomplete Tasks
+| Task | Status | Reason |
+|------|--------|--------|
+| 2.3 Add validation | ❌ Not executed | Skipped during phase 2 |
+| 3.1 Write E2E tests | ❌ Partial | Only 2 of 4 tests written |
+
+### Unchecked Checklist Items
+- [ ] Documentation updated
+- [ ] E2E tests passing
+
+### Missing File Operations
+| Action | File | Status |
+|--------|------|--------|
+| CREATE | `src/validators/email.ts` | ❌ Not created |
+
+---
+
+**Options:**
+1. Complete the remaining tasks now
+2. Mark tasks as intentionally skipped (with reason)
+3. Abort and leave plan as IN_PROGRESS
+
+How would you like to proceed?
+```
+
+**STOP and wait for user guidance if any tasks are incomplete.**
+
+Only proceed to the final review when ALL tasks are verified complete or explicitly marked as skipped with user approval.
+
+### Step 3: Mandatory Final Review
 
 **REQUIRED:** Invoke review-implementation for the complete plan:
 
@@ -272,7 +322,7 @@ This validates:
 - No regressions introduced
 - Documentation updated if required
 
-### Step 3: Update Plan Status
+### Step 4: Update Plan Status
 
 Mark the plan as complete:
 
@@ -280,9 +330,9 @@ Mark the plan as complete:
 **Status:** COMPLETE
 ```
 
-Update the checklist in the plan file.
+Update the checklist in the plan file (mark all items as `[x]`).
 
-### Step 4: Summary Report
+### Step 5: Summary Report
 
 ```markdown
 ## Execution Complete: {plan-name}
@@ -312,7 +362,7 @@ Update the checklist in the plan file.
 {list of commits created}
 ```
 
-### Step 5: Invoke Archive
+### Step 6: Invoke Archive
 
 After successful completion, invoke `merge-archive-plan`:
 
