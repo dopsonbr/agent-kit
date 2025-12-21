@@ -1,24 +1,23 @@
 ---
 name: create-plan
-description: Create detailed implementation plans with TDD-style tasks. Use when planning features, refactoring, or any multi-step development work before writing code.
+description: Create detailed implementation plans with diagrams and dependency graphs. Use when planning features, refactoring, or multi-step development work before writing code.
 license: MIT
 metadata:
   author: agent-kit
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # Create Implementation Plan
 
-Generate structured, executable implementation plans that follow TDD principles.
+Generate structured, executable implementation plans with visual diagrams and dependency tracking.
 
 ## Purpose
 
-Transform requirements into actionable task lists where each task:
-- Takes 2-10 minutes to complete
-- Is atomic and self-contained
-- Follows RED-GREEN-REFACTOR pattern
-- Includes verification steps
-- Has a conventional commit message
+Transform requirements into actionable plans that:
+- Stay under 5000 tokens (hard cap)
+- Include visual diagrams (Mermaid or ASCII)
+- Show task/subplan dependencies
+- Are numbered sequentially in `docs/plans/`
 
 ## When to Use
 
@@ -27,130 +26,251 @@ Transform requirements into actionable task lists where each task:
 - For breaking down complex changes
 - After brainstorming, before coding
 
-## Plan Structure
+## Critical Constraints
 
-Every plan follows this format (see [assets/plan-template.md](assets/plan-template.md)):
+### Token Limit: Hard Cap 5000
 
-1. **Header** - Goal, design doc reference, estimates
-2. **Architecture Overview** - How it fits together
-3. **Tasks** - Numbered, sequential steps
-4. **Integration Verification** - Final checks
-5. **Rollback Plan** - How to undo if needed
+- **Optimal:** 2000-3000 tokens (fits well in context with code)
+- **Maximum:** 5000 tokens (STOP if exceeded)
+- If plan would exceed 5000 tokens, create subplans instead
+- Validate with: `bun run scripts/validate-plan.ts <plan-file>`
 
-## Task Format
+### Reference, Never Copy
 
-Each task must include:
+- Reference docs by path only: `per docs/standards/validation.md`
+- NEVER paste external content into the plan
+- Only include directly relevant references
+
+## Workflow
+
+### Phase 1: Gather Requirements
+
+**Ask clarifying questions before planning:**
+
+1. **Scope**: What exactly should this feature do?
+2. **Boundaries**: What's explicitly out of scope?
+3. **Dependencies**: What existing code/systems does this touch?
+4. **Constraints**: Any technical requirements or limitations?
+5. **Success Criteria**: How do we know it's done?
+
+Do NOT proceed until you have clear answers.
+
+### Phase 2: Explore Codebase
+
+Use the Explore subagent to understand:
+- Existing modules and patterns
+- Files that will need modification
+- Dependencies and integration points
+- Documentation that needs updates
+
+### Phase 3: Design Architecture
+
+Create diagrams to illustrate:
+- Component relationships
+- Data/control flow
+- State transitions
+- Interactions and sequences
+
+Use Mermaid (preferred) or ASCII. Choose the diagram type that best fits:
+
+**Flowchart** - Component relationships, data flow:
+```mermaid
+graph TD
+    A[Component A] --> B[Component B]
+    B --> C[Component C]
+```
+
+**Sequence** - API calls, interactions between systems:
+```mermaid
+sequenceDiagram
+    Client->>+API: POST /users
+    API->>+DB: INSERT user
+    DB-->>-API: user record
+    API-->>-Client: 201 Created
+```
+
+**State** - Lifecycle, status transitions:
+```mermaid
+stateDiagram-v2
+    [*] --> Draft
+    Draft --> Review
+    Review --> Approved
+    Review --> Draft: Changes requested
+    Approved --> [*]
+```
+
+**Class** - Object relationships, data models:
+```mermaid
+classDiagram
+    User "1" --> "*" Order
+    Order "1" --> "*" LineItem
+```
+
+**ASCII** - When Mermaid isn't rendered:
+```
+┌──────────────┐         ┌──────────────┐
+│  Component A │ ──────► │  Component B │
+└──────────────┘         └──────────────┘
+```
+
+### Phase 4: Plan Tasks
+
+Break work into phases and tasks:
+- Each task should be 2-15 minutes
+- Include file paths (CREATE/MODIFY/DELETE)
+- Add verification steps
+- Include commit messages
+
+### Phase 5: Check Size & Split
+
+Before writing:
+1. Estimate token count (~4 chars = 1 token)
+2. If > 3000 tokens, consider splitting
+3. If > 5000 tokens, MUST create subplans
+
+**Subplan Strategy:**
+```
+030_feature-initiative.md      (parent overview)
+├── 030A_frontend-component.md (subplan A)
+├── 030B_backend-api.md        (subplan B)
+└── 030C_integration.md        (subplan C)
+```
+
+### Phase 6: Define Testing Strategy
+
+Every plan MUST include a testing strategy with:
+
+1. **Automated Tests** (required)
+   - Prefer E2E tests that validate the full feature flow
+   - Include integration tests for component interactions
+   - Add unit tests for complex logic
+
+2. **Manual Validation** (required)
+   - Step-by-step instructions for human verification
+   - What to look for, what to click, what to expect
+   - Screenshots or recordings if helpful
 
 ```markdown
-## Task N: {Descriptive Title}
+## Testing Strategy
 
-**Files:**
-- Create: `path/to/new/file.ts`
-- Modify: `path/to/existing/file.ts`
-- Delete: `path/to/obsolete/file.ts`
+### Automated Tests
 
-**Step 1: Write the failing test (RED)**
+| Type | What It Tests | Command |
+|------|---------------|---------|
+| E2E | Full user flow | `bun test:e2e tests/e2e/feature.spec.ts` |
+| Integration | API + DB | `bun test tests/integration/` |
+| Unit | Core logic | `bun test tests/unit/` |
 
-\`\`\`typescript
-// tests/feature.test.ts
-describe("Feature", () => {
-  it("should do the thing", () => {
-    expect(doThing()).toBe(expected);
-  });
-});
-\`\`\`
+### Manual Validation
 
-**Step 2: Implement the code (GREEN)**
-
-\`\`\`typescript
-// src/feature.ts
-export function doThing() {
-  return expected;
-}
-\`\`\`
-
-**Step 3: Verify**
-
-\`\`\`bash
-bun test tests/feature.test.ts
-# Expected: 1 test passing
-\`\`\`
-
-**Commit:** `feat(feature): add doThing function`
+1. Navigate to /settings
+2. Click "Preferences" tab
+3. Toggle dark mode
+4. **Expected:** Theme changes immediately
+5. Refresh page
+6. **Expected:** Setting persists
 ```
 
-## Task Requirements
+### Phase 7: Create Dependency Graph
 
-### Atomicity
-Each task must be independently completable. No task should depend on uncommitted work from another task.
+Every plan MUST end with a dependency graph showing:
+- Which tasks/subplans can run in parallel
+- Which must be sequential
+- External prerequisites
 
-### Completeness
-Provide **complete code**, not pseudocode or placeholders:
-- ❌ `// TODO: implement validation`
-- ❌ `// ... rest of implementation`
-- ✅ Full, working code that passes tests
+```mermaid
+graph TD
+    subgraph "Prerequisites"
+        P1[Prior Plan 029]
+    end
 
-### Exact Paths
-Use precise file paths, never vague references:
-- ❌ "in the utils folder"
-- ✅ `src/lib/utils/validation.ts`
+    subgraph "This Plan"
+        A[Phase 1: Setup] --> B[Phase 2: Core]
+        A --> C[Phase 3: Tests]
+        B --> D[Phase 4: Integration]
+        C --> D
+    end
 
-### Verification
-Every task ends with a verification command:
+    P1 --> A
+```
+
+### Phase 8: Write Plan
+
+Write to: `docs/plans/{NNNN}_{FEATURE_NAME}.md`
+
+Use the template from [assets/plan-template.md](assets/plan-template.md).
+
+### Phase 9: Validate
+
+Run the validation script:
 ```bash
-bun test tests/specific.test.ts
-# Expected: N tests passing
+bun run content/skills/create-plan/scripts/validate-plan.ts docs/plans/{plan-file}.md
 ```
 
-## TDD Pattern
+### Phase 10: Offer Worktree Setup
 
-### RED Phase
-Write a failing test first. The test defines the expected behavior.
+After plan is complete, ask:
+> "Would you like me to create a git worktree for implementing this plan?"
 
-### GREEN Phase  
-Write the minimal code to make the test pass. No more, no less.
-
-### REFACTOR Phase (if needed)
-Clean up without changing behavior. Tests must still pass.
-
-## Commit Messages
-
-Use Conventional Commits format:
-
+Worktrees are created in `.worktrees/` named after the plan:
+```bash
+git worktree add .worktrees/0042_user-preferences -b feature/0042_user-preferences
 ```
-<type>(<scope>): <description>
 
-Types:
-- feat: New feature
-- fix: Bug fix
-- refactor: Code change without feature/fix
-- test: Adding tests
-- docs: Documentation only
-- chore: Maintenance tasks
-```
+See [references/worktree-setup.md](references/worktree-setup.md) for details.
+
+## Plan Numbering
+
+1. Check `docs/plans/` for the highest existing plan number
+2. Use the next sequential number
+3. Format: `{NNNN}_{FEATURE_NAME}.md` (4 digits, zero-padded)
+
+Examples:
+- `0001_user-authentication.md`
+- `0042_api-refactor.md`
+- `0100_database-migration.md`
 
 ## Output Location
 
-Plans are saved to: `docs/plans/{feature-name}-plan.md`
-
-## Example Usage
+All plans go to: `docs/plans/`
 
 ```
-User: Create a plan for adding user authentication
-
-Claude: [Reviews project structure]
-[Identifies relevant files and patterns]
-[Generates plan with 5-10 tasks]
-[Saves to docs/plans/user-auth-plan.md]
+docs/plans/
+├── 0001_initial-setup.md
+├── 0002_user-auth.md
+├── 0003A_frontend-forms.md
+├── 0003B_backend-validation.md
+└── 0003C_integration-tests.md
 ```
 
-## Template Reference
+## Plan Structure
 
 See [assets/plan-template.md](assets/plan-template.md) for the full template.
+
+Key sections:
+1. **Header** - Status, overview, goals
+2. **References** - Only directly relevant docs
+3. **Architecture** - Mermaid/ASCII diagrams
+4. **Phases** - Numbered tasks with prereqs
+5. **Files Summary** - CREATE/MODIFY/DELETE table
+6. **Testing Strategy** - Automated tests + manual validation (required)
+7. **Dependency Graph** - Required at end
+8. **Checklist** - Completion tracking
+
+## Examples
+
+See [references/examples.md](references/examples.md) for complete plan examples.
+
+## Validation
+
+Run validation before finalizing:
+- Token count under 5000
+- Testing strategy present (automated + manual)
+- Dependency graph present
+- Proper numbering format
 
 ## Related Skills
 
 - `brainstorm` - Use before planning to explore ideas
 - `review-plan` - Review a plan before execution
 - `implement-plan` - Execute a plan task by task
-- `create-adr` - Document architectural decisions made during planning
