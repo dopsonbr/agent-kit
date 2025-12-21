@@ -312,6 +312,44 @@ Update the checklist in the plan file.
 {list of commits created}
 ```
 
+### Step 5: Invoke Archive
+
+After successful completion, invoke `merge-archive-plan`:
+
+```bash
+# Check current branch
+git branch --show-current
+```
+
+**If on feature branch/worktree:**
+```
+Plan execution complete on feature branch.
+
+The plan will be archived after the PR is merged to main.
+Use `/ak-merge-archive-plan` after merge to archive with full metadata.
+```
+
+Skip archiving - wait for PR merge.
+
+**If on main branch:**
+
+Prompt user for confirmation:
+
+```
+Plan execution complete on main branch.
+
+Would you like to archive this plan now?
+- The plan will be moved to docs/plans/archive/
+- Archive metadata will be added (commits, files, lessons learned)
+
+[Yes] [No, I'll do it later]
+```
+
+If user confirms, invoke:
+```
+/ak-merge-archive-plan {plan-path}
+```
+
 ## Error Handling
 
 ### Blocking Errors
@@ -418,3 +456,4 @@ Ready to proceed to Phase 2: API Endpoints?
 - `create-plan` - Creates plans this skill executes
 - `review-plan` - Validates plans before execution
 - `review-implementation` - Checkpoint reviews during execution
+- `merge-archive-plan` - Archives plans after completion

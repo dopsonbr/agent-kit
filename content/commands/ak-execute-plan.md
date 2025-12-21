@@ -23,6 +23,7 @@ Key steps:
 7. Apply review feedback critically (evaluate, don't blindly apply)
 8. After ALL phases complete, invoke review-implementation for final review
 9. Generate execution report
+10. Invoke merge-archive-plan (prompt if on main, skip if on feature branch)
 
 Use the references from:
 - @skills/plan-execute/references/subagent-patterns.md - For subagent coordination patterns
