@@ -1,6 +1,6 @@
 # 0003_init-command
 
-**Status:** DRAFT
+**Status:** COMPLETE
 
 ---
 
@@ -516,12 +516,12 @@ graph TD
 
 ## Checklist
 
-- [ ] Phase 1 complete (test harness)
-- [ ] Phase 2 complete (fetcher)
-- [ ] Phase 3 complete (installer)
-- [ ] Phase 4 complete (init integration)
-- [ ] Phase 5 complete (E2E tests)
-- [ ] All tests passing
+- [x] Phase 1 complete (test harness)
+- [x] Phase 2 complete (fetcher)
+- [x] Phase 3 complete (installer)
+- [x] Phase 4 complete (init integration)
+- [x] Phase 5 complete (E2E tests)
+- [x] All tests passing
 - [ ] Manual validation complete
 
 ---
