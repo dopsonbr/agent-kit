@@ -43,19 +43,24 @@ Why third-party review matters:
 Use the dedicated `codex review` command for non-interactive review:
 
 ```bash
-# Review with custom instructions from stdin
-cat <<'PROMPT' | codex review -
-<review instructions here>
-PROMPT
+# Pass instructions directly as argument
+codex review "Review the plan at docs/plans/0042_feature.md for feasibility and completeness"
 
-# Or pass instructions directly
-codex review "Review the plan at docs/plans/0042_feature.md for feasibility"
+# Or read instructions from stdin
+cat <<'PROMPT' | codex review -
+Review the implementation plan at docs/plans/0042_feature.md
+
+Check for: logical coherence, completeness, standards compliance, feasibility.
+Provide PASS/FAIL/NEEDS_REVISION verdict.
+PROMPT
 ```
 
 **Key options:**
-- Use `-` to read custom instructions from stdin (required for non-TTY environments)
-- Use `-c model="gpt-5.1-codex-max"` for high-reasoning model
+- Use `[PROMPT]` argument for simple instructions
+- Use `-` to read longer instructions from stdin
 - Use heredoc with `'PROMPT'` (quoted) to prevent variable expansion
+
+**Note:** When reviewing plans (not code changes), use the `[PROMPT]` form since `--base`, `--commit`, and `--uncommitted` flags are for reviewing code diffs.
 
 ## Workflow
 

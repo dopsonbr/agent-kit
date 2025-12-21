@@ -44,15 +44,18 @@ Use the dedicated `codex review` command for non-interactive code review:
 
 ```bash
 # Review uncommitted changes
-codex review --uncommitted "Check for bugs and security issues"
+codex review --uncommitted --title "Review Title"
 
 # Review changes against a base branch
-codex review --base main "Verify implementation matches plan specs"
+codex review --base main --title "PR Review"
 
 # Review a specific commit
-codex review --commit abc123 "Validate code quality"
+codex review --commit abc123 --title "Commit Review"
 
-# Read custom instructions from stdin
+# Review with custom instructions (no scope flags)
+codex review "Check for security issues in the authentication code"
+
+# Read custom instructions from stdin (no scope flags)
 cat <<'PROMPT' | codex review -
 <review instructions here>
 PROMPT
@@ -63,7 +66,10 @@ PROMPT
 - `--base <BRANCH>` - Review changes against a base branch
 - `--commit <SHA>` - Review changes introduced by a specific commit
 - `--title <TITLE>` - Optional title for the review summary
-- `-c model="gpt-5.1-codex-max"` - Use high-reasoning model
+
+**IMPORTANT:** The `--base`, `--commit`, and `--uncommitted` flags **cannot** be combined with a `[PROMPT]` argument. Use either:
+1. Scope flags (`--commit`, `--base`, `--uncommitted`) with optional `--title`
+2. OR a custom `[PROMPT]` without scope flags
 
 ## Review Scopes
 
@@ -151,53 +157,28 @@ Use `codex review` with the appropriate scope:
 **For Phase Review (uncommitted changes):**
 
 ```bash
-cat <<'PROMPT' | codex review --uncommitted --title "Phase {N} Review" -
-Review implementation for Phase {N} of plan {plan-path}
-
-Check against these criteria:
-1. Task Completion - Did all tasks complete as specified?
-2. Code Quality - Follows project patterns? No obvious bugs?
-3. Test Coverage - Tests adequate and meaningful?
-4. Security - No hardcoded secrets? Input validation present?
-5. Regressions - Any breaking changes introduced?
-
-Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
-PROMPT
+codex review --uncommitted --title "Phase {N}: {phase-name}"
 ```
 
 **For Phase Review (committed changes):**
 
 ```bash
-cat <<'PROMPT' | codex review --commit {phase-commit-sha} --title "Phase {N} Review" -
-Review implementation for Phase {N} of plan {plan-path}
-
-Check: Task completion, code quality, test coverage, security, regressions.
-Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
-PROMPT
+codex review --commit {phase-commit-sha} --title "Phase {N}: {phase-name}"
 ```
 
 **For Plan Review (against base branch):**
 
 ```bash
-cat <<'PROMPT' | codex review --base main --title "Plan Review: {plan-name}" -
-Review complete implementation of plan {plan-path}
-
-Check against these criteria:
-1. All Phases Complete - Every task in every phase done?
-2. Test Coverage - Adequate tests for all changes?
-3. Code Quality - Consistent patterns? Maintainable?
-4. Documentation - Updated where needed?
-5. No Regressions - All existing tests still pass?
-
-Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
-PROMPT
+codex review --base main --title "Plan Review: {plan-name}"
 ```
 
-**Important:** Codex has filesystem access and will:
-- Read the plan file to understand expectations
+**Note:** Scope flags (`--commit`, `--base`, `--uncommitted`) cannot be combined with custom prompts. Codex will automatically analyze the changes and provide a structured review.
+
+**Codex will:**
+- Read the changed files and understand the context
 - Examine the actual code changes
-- Verify implementation matches specifications
-- Check patterns against existing codebase
+- Check for bugs, security issues, and code quality
+- Provide a structured review with findings
 
 ### Step 5: Run Verification
 
@@ -352,10 +333,7 @@ Claude: I'll review Phase 1 using Codex CLI for independent validation.
 [Runs: which codex]
 /opt/homebrew/bin/codex
 
-[Runs: cat <<'PROMPT' | codex review --commit abc123 --title "Phase 1 Review" -
-Review implementation for Phase 1 of plan docs/plans/0042_user-auth.md
-...
-PROMPT]
+[Runs: codex review --commit abc123 --title "Phase 1: Database Schema"]
 
 Codex returned:
 
@@ -390,10 +368,7 @@ All tasks complete, tests passing, no issues found.
 
 Claude: I'll review Phase 2 using Codex CLI.
 
-[Runs: cat <<'PROMPT' | codex review --commit def456 --title "Phase 2 Review" -
-Review implementation for Phase 2 of plan docs/plans/0042_user-auth.md
-...
-PROMPT]
+[Runs: codex review --commit def456 --title "Phase 2: API Endpoints"]
 
 Codex returned:
 
@@ -422,10 +397,7 @@ Codex returned:
 
 Claude: I'll perform the final plan review using Codex CLI.
 
-[Runs: cat <<'PROMPT' | codex review --base main --title "Plan Review: 0042_user-auth" -
-Review complete implementation of plan docs/plans/0042_user-auth.md
-...
-PROMPT]
+[Runs: codex review --base main --title "Plan Review: 0042_user-auth"]
 
 Codex returned:
 
