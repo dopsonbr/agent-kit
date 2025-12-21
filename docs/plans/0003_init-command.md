@@ -86,21 +86,20 @@ graph TD
 
 Create minimal test fixtures that mirror the content/ structure:
 
-```typescript
-// tests/fixtures/skills/test-skill/SKILL.md
+```markdown
+# tests/fixtures/skills/test-skill/SKILL.md
 ---
 name: test-skill
 description: A test skill for automated testing
 license: MIT
-metadata:
-  author: test
-  version: "1.0.0"
 ---
 
 # Test Skill
 
 This is a test skill used for automated testing.
 ```
+
+**Note:** Use flat frontmatter (no nested `metadata` block) since `parseSkillMd` only supports `key: value` format.
 
 **Verification:**
 
@@ -263,39 +262,62 @@ bun test tests/lib/installer.test.ts
 
 **Implementation:**
 
-Replace the stub with actual implementation:
+Replace the stub with actual implementation that respects the selected preset:
 
 ```typescript
 export async function initCommand(args: ParsedArgs): Promise<void> {
   const cwd = process.cwd()
   const useLocal = args.flags.local === true
 
-  // ... existing preset validation ...
+  // Get preset from flag or use default
+  const presetName = (args.flags.preset as string) || DEFAULT_PRESET
+  const preset = getPreset(presetName)
+  if (!preset) {
+    print(format.error(`Unknown preset: ${presetName}`))
+    return
+  }
+
+  // Build config from preset
+  const config: AkConfig = {
+    ...DEFAULT_CONFIG,
+    targets: preset.targets,
+    defaults: { reviewTool: preset.defaultTool },
+  }
 
   print(`${symbols.info} Fetching skills...`)
-  const { skills } = await fetchContent({
-    repo: DEFAULT_CONFIG.source.repo,
-    branch: DEFAULT_CONFIG.source.branch,
-    path: DEFAULT_CONFIG.source.path,
+  const { skills: allSkills } = await fetchContent({
+    repo: config.source.repo,
+    branch: config.source.branch,
+    path: config.source.path,
     useLocal,
   })
-  print(format.success(`Found ${skills.length} skills`))
+
+  // Filter skills based on preset
+  const skills = allSkills.filter(s => preset.skills.includes(s.name))
+  print(format.success(`Found ${skills.length} skills for preset '${presetName}'`))
 
   print(`${symbols.info} Installing skills...`)
-  await installSkills({ cwd, config: DEFAULT_CONFIG, skills, commands: [] })
+  await installSkills({ cwd, config, skills, commands: [] })
   print(format.success('Skills installed'))
 
-  print(`${symbols.info} Generating AGENTS.md...`)
-  generateAgentsMd(cwd, DEFAULT_CONFIG, skills)
-  print(format.success('Created AGENTS.md'))
+  if (config.targets.agentsMd) {
+    print(`${symbols.info} Generating AGENTS.md...`)
+    generateAgentsMd(cwd, config, skills)
+    print(format.success('Created AGENTS.md'))
+  }
 
-  saveConfig(DEFAULT_CONFIG, cwd)
+  saveConfig(config, cwd)
   print(format.success('Created .ak/config.json'))
 
-  // Success box
   printBox('agent-kit initialized!', [...])
 }
 ```
+
+**Key changes from stub:**
+- Uses `getPreset()` to get selected preset configuration
+- Filters fetched skills to only those in `preset.skills`
+- Uses preset's `targets` and `defaultTool` in saved config
+- Conditionally generates AGENTS.md based on `config.targets.agentsMd`
 
 **Verification:**
 
@@ -340,32 +362,63 @@ bun run src/cli/index.ts help init | grep -q "local"
 
 **Implementation:**
 
+Test the init command by calling the underlying functions directly with `localPath` pointing to fixtures:
+
 ```typescript
+import { resolve } from 'path'
+
+const FIXTURES_PATH = resolve(__dirname, '../fixtures')
+
 describe('Init Command', () => {
-  beforeEach(() => setupTestDir())
-  afterEach(() => teardownTestDir())
+  let originalCwd: string
 
-  it('initializes with --local flag', async () => {
-    const cwd = getTestDir()
-    process.chdir(cwd)
-
-    await initCommand({
-      command: 'init',
-      flags: { yes: true, local: true },
-      positional: []
-    })
-
-    expect(existsSync(join(cwd, '.github/skills'))).toBe(true)
-    expect(existsSync(join(cwd, '.claude/skills'))).toBe(true)
-    expect(existsSync(join(cwd, 'AGENTS.md'))).toBe(true)
-    expect(existsSync(join(cwd, '.ak/config.json'))).toBe(true)
+  beforeEach(() => {
+    originalCwd = process.cwd()
+    setupTestDir()
+    process.chdir(getTestDir())
   })
 
-  it('creates symlinks from .claude to .github', async () => {
-    // ... test symlink creation
+  afterEach(() => {
+    process.chdir(originalCwd)
+    teardownTestDir()
+  })
+
+  it('fetches skills from local fixtures', async () => {
+    const { skills } = await fetchContent({
+      repo: 'github:test/test',
+      branch: 'main',
+      path: 'content',
+      useLocal: true,
+      localPath: FIXTURES_PATH,  // Point to tests/fixtures
+    })
+
+    expect(skills.length).toBeGreaterThan(0)
+    expect(skills[0].name).toBe('test-skill')
+  })
+
+  it('installs skills and creates symlinks', async () => {
+    const cwd = getTestDir()
+    const skills = [{ name: 'test-skill', description: 'Test', content: '...' }]
+
+    await installSkills({ cwd, config: DEFAULT_CONFIG, skills, commands: [] })
+
+    expect(existsSync(join(cwd, '.github/skills/test-skill'))).toBe(true)
+    expect(lstatSync(join(cwd, '.claude/skills/test-skill')).isSymbolicLink()).toBe(true)
+  })
+
+  it('generates AGENTS.md with skill list', () => {
+    const cwd = getTestDir()
+    const skills = [{ name: 'test-skill', description: 'Test', content: '' }]
+
+    generateAgentsMd(cwd, DEFAULT_CONFIG, skills)
+
+    const content = readFileSync(join(cwd, 'AGENTS.md'), 'utf-8')
+    expect(content).toContain('test-skill')
   })
 })
 ```
+
+**Note:** Tests use `localPath` to point fetchContent at `tests/fixtures` instead of relying on `content/` existing in the test directory.
 
 **Verification:**
 
