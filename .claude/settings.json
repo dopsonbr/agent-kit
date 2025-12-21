@@ -1,5 +1,5 @@
 {
-  "$schema": "https://claude.ai/schemas/claude-settings.json",
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "agent-kit": {
     "version": "0.1.0",
     "mode": "development",
