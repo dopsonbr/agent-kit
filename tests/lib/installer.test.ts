@@ -109,6 +109,28 @@ Content here.`,
       expect(existsSync(claudeSkillPath)).toBe(false)
     })
 
+    it('installs skills for claude-only preset (no copilot)', async () => {
+      const config = {
+        ...DEFAULT_CONFIG,
+        targets: { ...DEFAULT_CONFIG.targets, copilot: false, claude: true },
+      }
+
+      await installSkills({
+        cwd: testDir,
+        config,
+        skills: [testSkill],
+        commands: [],
+      })
+
+      // Skills should be installed to .github/skills (canonical location)
+      expect(existsSync(join(testDir, '.github/skills/test-skill/SKILL.md'))).toBe(true)
+
+      // Symlink should be created for claude
+      const claudeSkillPath = join(testDir, '.claude/skills/test-skill')
+      expect(existsSync(claudeSkillPath)).toBe(true)
+      expect(lstatSync(claudeSkillPath).isSymbolicLink()).toBe(true)
+    })
+
     it('handles multiple skills', async () => {
       const skills: Skill[] = [
         { name: 'skill-one', description: 'First', content: '---\nname: skill-one\n---\n# One' },

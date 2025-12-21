@@ -37,7 +37,8 @@ export async function installSkills(options: InstallOptions): Promise<void> {
   }
 
   // Install skills to .github/skills (canonical location for Agent Skills)
-  if (config.targets.copilot) {
+  // Install if either copilot or claude target is enabled
+  if (config.targets.copilot || config.targets.claude) {
     for (const skill of skills) {
       const skillDir = join(cwd, ".github/skills", skill.name);
       mkdirSync(skillDir, { recursive: true });
@@ -45,8 +46,8 @@ export async function installSkills(options: InstallOptions): Promise<void> {
     }
   }
 
-  // Create symlinks from .claude/skills to .github/skills
-  if (config.targets.claude && config.targets.copilot) {
+  // Create symlinks from .claude/skills to .github/skills when claude is enabled
+  if (config.targets.claude) {
     for (const skill of skills) {
       const claudeSkillPath = join(cwd, ".claude/skills", skill.name);
       const githubSkillPath = join(cwd, ".github/skills", skill.name);
