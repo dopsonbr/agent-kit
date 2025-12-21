@@ -40,19 +40,30 @@ Why third-party review matters:
 
 ## Codex CLI Invocation
 
-The correct way to invoke Codex for non-interactive review:
+Use the dedicated `codex review` command for non-interactive code review:
 
 ```bash
-cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-<review prompt here>
+# Review uncommitted changes
+codex review --uncommitted "Check for bugs and security issues"
+
+# Review changes against a base branch
+codex review --base main "Verify implementation matches plan specs"
+
+# Review a specific commit
+codex review --commit abc123 "Validate code quality"
+
+# Read custom instructions from stdin
+cat <<'PROMPT' | codex review -
+<review instructions here>
 PROMPT
 ```
 
-**Key details:**
-- Use `codex exec` for non-interactive mode (not bare `codex`)
-- Use `-m gpt-5.1-codex-max` for high-reasoning model
-- Pipe prompt via stdin with `-` flag (required for non-TTY environments)
-- Use heredoc with `'PROMPT'` (quoted) to prevent variable expansion
+**Key options:**
+- `--uncommitted` - Review staged, unstaged, and untracked changes
+- `--base <BRANCH>` - Review changes against a base branch
+- `--commit <SHA>` - Review changes introduced by a specific commit
+- `--title <TITLE>` - Optional title for the review summary
+- `-c model="gpt-5.1-codex-max"` - Use high-reasoning model
 
 ## Review Scopes
 
@@ -135,16 +146,13 @@ If not available, stop and inform the user they need to install Codex CLI.
 
 ### Step 4: Invoke Codex Review
 
-Build the review prompt based on scope and invoke Codex using stdin:
+Use `codex review` with the appropriate scope:
 
-**For Phase Review:**
+**For Phase Review (uncommitted changes):**
 
 ```bash
-cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-Review the implementation for Phase {N} of plan {plan-path}
-
-Changes to review:
-{git diff output or file list}
+cat <<'PROMPT' | codex review --uncommitted --title "Phase {N} Review" -
+Review implementation for Phase {N} of plan {plan-path}
 
 Check against these criteria:
 1. Task Completion - Did all tasks complete as specified?
@@ -153,25 +161,26 @@ Check against these criteria:
 4. Security - No hardcoded secrets? Input validation present?
 5. Regressions - Any breaking changes introduced?
 
-Provide:
-1. PASS/NEEDS_REVISION/FAIL verdict
-2. Summary of findings
-3. Specific issues with severity (HIGH/MEDIUM/LOW)
-4. Recommended fixes
+Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
 PROMPT
 ```
 
-**For Plan Review:**
+**For Phase Review (committed changes):**
 
 ```bash
-cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-Review the complete implementation of plan {plan-path}
+cat <<'PROMPT' | codex review --commit {phase-commit-sha} --title "Phase {N} Review" -
+Review implementation for Phase {N} of plan {plan-path}
 
-All commits in this execution:
-{git log output}
+Check: Task completion, code quality, test coverage, security, regressions.
+Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
+PROMPT
+```
 
-Files changed:
-{git diff --stat output}
+**For Plan Review (against base branch):**
+
+```bash
+cat <<'PROMPT' | codex review --base main --title "Plan Review: {plan-name}" -
+Review complete implementation of plan {plan-path}
 
 Check against these criteria:
 1. All Phases Complete - Every task in every phase done?
@@ -180,18 +189,15 @@ Check against these criteria:
 4. Documentation - Updated where needed?
 5. No Regressions - All existing tests still pass?
 
-Provide:
-1. PASS/NEEDS_REVISION/FAIL verdict
-2. Summary of findings
-3. Specific issues with severity (HIGH/MEDIUM/LOW)
-4. Recommended fixes
+Provide: PASS/NEEDS_REVISION/FAIL verdict with specific issues.
 PROMPT
 ```
 
-**Important:** Let Codex read the files itself - it has filesystem access. This allows it to:
-- Verify implementation matches plan specifications
-- Check code patterns against existing codebase
-- Validate test coverage is meaningful
+**Important:** Codex has filesystem access and will:
+- Read the plan file to understand expectations
+- Examine the actual code changes
+- Verify implementation matches specifications
+- Check patterns against existing codebase
 
 ### Step 5: Run Verification
 
@@ -346,8 +352,8 @@ Claude: I'll review Phase 1 using Codex CLI for independent validation.
 [Runs: which codex]
 /opt/homebrew/bin/codex
 
-[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-Review the implementation for Phase 1 of plan docs/plans/0042_user-auth.md
+[Runs: cat <<'PROMPT' | codex review --commit abc123 --title "Phase 1 Review" -
+Review implementation for Phase 1 of plan docs/plans/0042_user-auth.md
 ...
 PROMPT]
 
@@ -384,8 +390,8 @@ All tasks complete, tests passing, no issues found.
 
 Claude: I'll review Phase 2 using Codex CLI.
 
-[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-Review the implementation for Phase 2 of plan docs/plans/0042_user-auth.md
+[Runs: cat <<'PROMPT' | codex review --commit def456 --title "Phase 2 Review" -
+Review implementation for Phase 2 of plan docs/plans/0042_user-auth.md
 ...
 PROMPT]
 
@@ -416,8 +422,8 @@ Codex returned:
 
 Claude: I'll perform the final plan review using Codex CLI.
 
-[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-Review the complete implementation of plan docs/plans/0042_user-auth.md
+[Runs: cat <<'PROMPT' | codex review --base main --title "Plan Review: 0042_user-auth" -
+Review complete implementation of plan docs/plans/0042_user-auth.md
 ...
 PROMPT]
 

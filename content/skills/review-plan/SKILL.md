@@ -40,18 +40,21 @@ Why third-party review matters:
 
 ## Codex CLI Invocation
 
-The correct way to invoke Codex for non-interactive review:
+Use the dedicated `codex review` command for non-interactive review:
 
 ```bash
-cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
-<review prompt here>
+# Review with custom instructions from stdin
+cat <<'PROMPT' | codex review -
+<review instructions here>
 PROMPT
+
+# Or pass instructions directly
+codex review "Review the plan at docs/plans/0042_feature.md for feasibility"
 ```
 
-**Key details:**
-- Use `codex exec` for non-interactive mode (not bare `codex`)
-- Use `-m gpt-5.1-codex-max` for high-reasoning model
-- Pipe prompt via stdin with `-` flag (required for non-TTY environments)
+**Key options:**
+- Use `-` to read custom instructions from stdin (required for non-TTY environments)
+- Use `-c model="gpt-5.1-codex-max"` for high-reasoning model
 - Use heredoc with `'PROMPT'` (quoted) to prevent variable expansion
 
 ## Workflow
@@ -91,7 +94,7 @@ If not available, stop and inform the user they need to install Codex CLI.
 Build the review prompt and invoke Codex using stdin:
 
 ```bash
-cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+cat <<'PROMPT' | codex review -
 Review the implementation plan at {plan-path}
 
 Check against these criteria:
@@ -183,7 +186,7 @@ Claude: I'll review this plan using Codex CLI for independent validation.
 [Runs: which codex]
 /opt/homebrew/bin/codex
 
-[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+[Runs: cat <<'PROMPT' | codex review -
 Review the implementation plan at docs/plans/0042_user-auth.md
 ...
 PROMPT]
