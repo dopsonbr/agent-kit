@@ -68,7 +68,61 @@ Key sections:
 - **references/**: Additional docs for complex topics
 - **scripts/**: Automation scripts
 
-### Step 6: Test the Skill
+### Step 6: Create Slash Command
+
+Every skill should have a corresponding slash command for easy invocation.
+
+**Command location:**
+```
+# Project command (matches skill location)
+.claude/commands/{skill-name}.md
+
+# agent-kit content (for distribution)
+content/commands/{skill-name}.md
+```
+
+**Command template:**
+```markdown
+---
+description: {One-line description of what command does}
+arguments:
+  - name: {arg-name}
+    description: {What the argument is for}
+    required: false
+---
+
+Use the {skill-name} skill to help the user {accomplish task}.
+
+Follow the {skill-name} skill instructions in @skills/{skill-name}/SKILL.md exactly.
+
+Key steps:
+1. {Step from skill}
+2. {Step from skill}
+...
+```
+
+See [assets/command-template.md](assets/command-template.md) for the full template.
+
+### Step 7: Validate with skill-validator
+
+Before finalizing, run the skill-validator to ensure the skill meets all requirements:
+
+```
+User: Validate my new skill at {path}
+
+Claude: [Runs skill-validator checks]
+[Reports any errors, warnings, or suggestions]
+```
+
+The validator checks:
+- Frontmatter requirements (name, description)
+- SKILL.md structure and token limits
+- All referenced files exist
+- Corresponding slash command exists
+
+**Only proceed if validation passes with no errors.**
+
+### Step 8: Test the Skill
 
 1. Ask Claude something that should trigger it
 2. Verify it activates correctly
@@ -212,16 +266,23 @@ For specific capabilities:
 
 After creation, provide:
 1. Path to the new skill
-2. How to test it
-3. How to iterate
+2. Path to the slash command
+3. Validation results
+4. How to test it
+5. How to iterate
 
 ```
-Created: .claude/skills/my-skill/SKILL.md
+Created:
+  Skill:   .claude/skills/my-skill/SKILL.md
+  Command: .claude/commands/my-skill.md
+
+Validation: ✅ PASSED (0 errors, 0 warnings)
 
 To test:
 1. Start a new conversation
-2. Ask: "Help me with {trigger phrase}"
-3. Verify the skill activates
+2. Use the slash command: /my-skill
+3. Or ask: "Help me with {trigger phrase}"
+4. Verify the skill activates
 
 To iterate:
 - Edit SKILL.md and test again
@@ -267,16 +328,19 @@ See [assets/skill-template.md](assets/skill-template.md) for the starter templat
 
 ## Validation
 
-Before finalizing, verify:
+Before finalizing, run `skill-validator` to verify:
 - [ ] Frontmatter has required fields (name, description)
 - [ ] Name follows rules (lowercase, hyphens, no reserved words)
 - [ ] Description includes what AND when
 - [ ] SKILL.md is under 5000 tokens
 - [ ] All referenced files exist
 - [ ] Examples are concrete and testable
+- [ ] Corresponding slash command exists
+- [ ] Command references the skill correctly
 
 ## Related Skills
 
+- `skill-validator` - Validates skills after creation (invoked automatically)
 - `doc-contents` - For documentation generation
 - `create-plan` - For implementation planning
 - `brainstorm` - For exploring skill ideas before creating

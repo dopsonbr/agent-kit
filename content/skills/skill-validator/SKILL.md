@@ -45,6 +45,8 @@ These reduce effectiveness:
 | Token limit | SKILL.md body should be < 5000 tokens |
 | Referenced files exist | All `[text](path)` links should resolve |
 | Has purpose section | Should explain what skill does |
+| Slash command exists | Corresponding command file should exist |
+| Command references skill | Command should reference the skill's SKILL.md |
 
 ### 🟢 Suggestions (Nice to Have)
 
@@ -160,10 +162,35 @@ const links = skillBody.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g);
 
 for (const [, text, path] of links) {
   if (path.startsWith("http")) continue; // Skip external links
-  
+
   const fullPath = resolve(skillDir, path);
   if (!exists(fullPath)) {
     error(`Broken link: ${path} (referenced as "${text}")`);
+  }
+}
+```
+
+### Step 6: Validate Slash Command
+
+```typescript
+const skillName = frontmatter.name;
+
+// Determine command location based on skill location
+// .claude/skills/{name}/ → .claude/commands/{name}.md
+// content/skills/{name}/ → content/commands/{name}.md
+const commandPath = skillDir
+  .replace('/skills/', '/commands/')
+  .replace(`/${skillName}/`, `/${skillName}.md`);
+
+// Check command exists
+if (!exists(commandPath)) {
+  warn(`No slash command found at ${commandPath}`);
+  warn("Create a command file to enable /{skill-name} invocation");
+} else {
+  // Verify command references the skill
+  const commandContent = read(commandPath);
+  if (!commandContent.includes(`@skills/${skillName}/SKILL.md`)) {
+    warn("Command does not reference the skill's SKILL.md");
   }
 }
 ```
@@ -193,6 +220,9 @@ Info:     2
 Files checked:
    ✓ SKILL.md (156 lines, ~620 tokens)
    ✓ assets/plan-template.md
+
+Command:
+   ✓ commands/create-plan.md (references skill correctly)
 ```
 
 ### Multi-Skill Report
@@ -231,6 +261,8 @@ Before publishing any skill:
 - [ ] SKILL.md has examples section
 - [ ] All file links resolve correctly
 - [ ] Body is under 5000 tokens
+- [ ] Slash command exists (e.g., `commands/{skill-name}.md`)
+- [ ] Command references `@skills/{skill-name}/SKILL.md`
 - [ ] Tested in fresh Claude Code session
 
 ## Integration with skill-creator
