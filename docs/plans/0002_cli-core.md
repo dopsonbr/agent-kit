@@ -1,6 +1,6 @@
 # 0002_cli-core
 
-**Status:** IN_PROGRESS
+**Status:** COMPLETE
 
 ---
 
@@ -157,7 +157,7 @@ Wires parser to router with top-level error handling.
 **Prereqs:** CLI implementation complete
 **Blockers:** None
 
-**Status:** PENDING
+**Status:** COMPLETE
 
 ### 5.1 Parser Tests
 
@@ -339,8 +339,8 @@ graph TD
 - [x] Phase 2 complete (output)
 - [x] Phase 3 complete (commands)
 - [x] Phase 4 complete (router)
-- [ ] Phase 5 complete (testing)
-- [ ] All tests passing
+- [x] Phase 5 complete (testing)
+- [x] All tests passing
 
 ---
 
