@@ -309,7 +309,42 @@ Extract event-driven patterns for messaging:
 
 **Prereqs:** Phase 1, Phase 2, Phase 3
 
-### 4.1 Remove Old Directories
+### 4.1 Archive Unmigrated Files
+
+**Files:**
+- ARCHIVE: `content/standards/backend/java/README.md`
+- ARCHIVE: `content/standards/backend/java/CODEX_findings.md`
+- ARCHIVE: `content/standards/frontend/react/README.md`
+- ARCHIVE: `content/standards/frontend/react/CODEX_findings.md`
+
+**Implementation:**
+
+These files don't fit the new taxonomy but contain valuable context:
+- README.md files are indexes (replaced by new category READMEs)
+- CODEX_findings.md files contain AI review notes worth preserving
+
+Archive to `docs/archive/standards-legacy/`:
+
+```bash
+mkdir -p docs/archive/standards-legacy
+cp content/standards/backend/java/README.md docs/archive/standards-legacy/backend-java-README.md
+cp content/standards/backend/java/CODEX_findings.md docs/archive/standards-legacy/backend-java-CODEX_findings.md
+cp content/standards/frontend/react/README.md docs/archive/standards-legacy/frontend-react-README.md
+cp content/standards/frontend/react/CODEX_findings.md docs/archive/standards-legacy/frontend-react-CODEX_findings.md
+```
+
+**Verification:**
+
+```bash
+ls docs/archive/standards-legacy/
+# Expected: 4 archived files
+```
+
+**Commit:** `chore(standards): archive legacy README and CODEX files`
+
+---
+
+### 4.2 Remove Old Directories
 
 **Files:**
 - DELETE: `content/standards/backend/`
@@ -343,6 +378,7 @@ ls content/standards/
 | CREATE | `content/standards/languages/css.md` | CSS patterns |
 | CREATE | `content/standards/data/data-validation.md` | Validation patterns |
 | CREATE | `content/standards/protocols-transports/messaging.md` | Event/messaging patterns |
+| ARCHIVE | `docs/archive/standards-legacy/*` | Legacy README and CODEX files |
 | DELETE | `content/standards/backend/` | Old structure |
 | DELETE | `content/standards/frontend/` | Old structure |
 
@@ -361,7 +397,8 @@ ls content/standards/
 1. Compare original Java standards with spring.md - verify no content lost
 2. Compare original React standards with react.md - verify no content lost
 3. Verify cross-references updated to new paths
-4. Confirm old directories removed
+4. Confirm README and CODEX files archived to docs/archive/standards-legacy/
+5. Confirm old directories removed
 
 ---
 
@@ -389,7 +426,8 @@ graph TD
     end
 
     subgraph "Phase 4"
-        T7[4.1 Remove Old Dirs]
+        T7[4.1 Archive Unmigrated]
+        T8[4.2 Remove Old Dirs]
     end
 
     P1 --> T1
@@ -404,6 +442,7 @@ graph TD
     T4 --> T7
     T5 --> T7
     T6 --> T7
+    T7 --> T8
 ```
 
 **Parallel Opportunities:**
@@ -417,7 +456,8 @@ graph TD
 - [ ] Phase 1 complete (Spring + Java)
 - [ ] Phase 2 complete (React + CSS)
 - [ ] Phase 3 complete (Validation + Messaging)
-- [ ] Phase 4 complete (Cleanup)
+- [ ] Phase 4 complete (Archive + Cleanup)
+- [ ] README and CODEX files archived
 - [ ] No content lost in migration
 - [ ] All new files match template
 

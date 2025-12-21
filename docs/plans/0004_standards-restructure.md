@@ -154,7 +154,7 @@ Each standard covers these topics where applicable:
 | 0004A | Template + topics | None |
 | 0004B | Migrate existing | 0004A |
 | 0004C | Languages | 0004A |
-| 0004D | Frameworks | 0004A, 0004C |
+| 0004D | Frameworks | 0004A, 0004B, 0004C |
 | 0004E | Protocols | 0004A |
 | 0004F | Data | 0004A |
 | 0004G | Tools | 0004A |
