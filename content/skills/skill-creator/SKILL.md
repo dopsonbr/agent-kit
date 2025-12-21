@@ -4,7 +4,7 @@ description: Create new Agent Skills with proper structure, templates, and best 
 license: MIT
 metadata:
   author: agent-kit
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Skill Creator
@@ -77,9 +77,17 @@ Every skill should have a corresponding slash command for easy invocation.
 # Project command (matches skill location)
 .claude/commands/{skill-name}.md
 
-# agent-kit content (for distribution)
-content/commands/{skill-name}.md
+# agent-kit content (for distribution) - MUST use ak- prefix
+content/commands/ak-{skill-name}.md
 ```
+
+**IMPORTANT: Naming Rules**
+
+1. **agent-kit commands MUST use `ak-` prefix**: All commands in `content/commands/` must be prefixed with `ak-` to avoid conflicts with user-created commands.
+   - ✅ `content/commands/ak-create-plan.md` → `/ak-create-plan`
+   - ❌ `content/commands/create-plan.md` → conflicts with user commands
+
+2. **No command/skill name conflicts**: Command names must not conflict with existing skill names in the same scope.
 
 **Command template:**
 ```markdown
@@ -119,6 +127,8 @@ The validator checks:
 - SKILL.md structure and token limits
 - All referenced files exist
 - Corresponding slash command exists
+- **agent-kit commands use `ak-` prefix** (for `content/commands/`)
+- **No command/skill name conflicts**
 
 **Only proceed if validation passes with no errors.**
 
@@ -337,6 +347,8 @@ Before finalizing, run `skill-validator` to verify:
 - [ ] Examples are concrete and testable
 - [ ] Corresponding slash command exists
 - [ ] Command references the skill correctly
+- [ ] agent-kit commands use `ak-` prefix (for `content/commands/`)
+- [ ] No command/skill name conflicts
 
 ## Related Skills
 

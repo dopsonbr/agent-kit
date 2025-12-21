@@ -4,7 +4,7 @@ description: Validate Agent Skills against best practices and specification requ
 license: MIT
 metadata:
   author: agent-kit
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
 # Skill Validator
@@ -47,6 +47,8 @@ These reduce effectiveness:
 | Has purpose section | Should explain what skill does |
 | Slash command exists | Corresponding command file should exist |
 | Command references skill | Command should reference the skill's SKILL.md |
+| agent-kit command prefix | Commands in `content/commands/` must use `ak-` prefix |
+| No name conflicts | Command name must not conflict with existing skill names |
 
 ### 🟢 Suggestions (Nice to Have)
 
@@ -177,20 +179,53 @@ const skillName = frontmatter.name;
 
 // Determine command location based on skill location
 // .claude/skills/{name}/ → .claude/commands/{name}.md
-// content/skills/{name}/ → content/commands/{name}.md
+// content/skills/{name}/ → content/commands/ak-{name}.md (with ak- prefix!)
+const isAgentKit = skillDir.includes('content/skills');
+const commandName = isAgentKit ? `ak-${skillName}` : skillName;
 const commandPath = skillDir
   .replace('/skills/', '/commands/')
-  .replace(`/${skillName}/`, `/${skillName}.md`);
+  .replace(`/${skillName}/`, `/${commandName}.md`);
 
 // Check command exists
 if (!exists(commandPath)) {
   warn(`No slash command found at ${commandPath}`);
-  warn("Create a command file to enable /{skill-name} invocation");
+  if (isAgentKit) {
+    warn("agent-kit commands must use 'ak-' prefix: ak-{skill-name}.md");
+  }
 } else {
   // Verify command references the skill
   const commandContent = read(commandPath);
   if (!commandContent.includes(`@skills/${skillName}/SKILL.md`)) {
     warn("Command does not reference the skill's SKILL.md");
+  }
+}
+```
+
+### Step 7: Validate Command Naming
+
+```typescript
+// Check for agent-kit command prefix
+if (isAgentKit) {
+  const commandFiles = listDir('content/commands/');
+  for (const file of commandFiles) {
+    if (!file.startsWith('ak-')) {
+      warn(`Command ${file} must use 'ak-' prefix for agent-kit distribution`);
+    }
+  }
+}
+
+// Check for command/skill name conflicts
+const allSkillNames = listDir(skillsDir).map(d => d.name);
+const allCommandNames = listDir(commandsDir).map(f => f.replace('.md', ''));
+
+for (const cmd of allCommandNames) {
+  const baseName = cmd.replace(/^ak-/, '');
+  // Skip if this is the matching command for a skill
+  if (allSkillNames.includes(baseName)) continue;
+
+  // Check for conflicts (same name as different skill)
+  if (allSkillNames.includes(cmd)) {
+    warn(`Command '${cmd}' conflicts with skill name '${cmd}'`);
   }
 }
 ```
@@ -263,6 +298,8 @@ Before publishing any skill:
 - [ ] Body is under 5000 tokens
 - [ ] Slash command exists (e.g., `commands/{skill-name}.md`)
 - [ ] Command references `@skills/{skill-name}/SKILL.md`
+- [ ] agent-kit commands use `ak-` prefix (e.g., `ak-create-plan.md`)
+- [ ] No command/skill name conflicts
 - [ ] Tested in fresh Claude Code session
 
 ## Integration with skill-creator

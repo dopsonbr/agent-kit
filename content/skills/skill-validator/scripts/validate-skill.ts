@@ -212,6 +212,58 @@ function validateSkill(skillPath: string): ValidationResult {
     }
   }
 
+  // ─── Command Validation ───────────────────────────────────────────────────
+
+  const skillName = frontmatter.name;
+  if (skillName) {
+    // Determine if this is an agent-kit skill
+    const isAgentKit = skillPath.includes("content/skills");
+
+    // Determine expected command path
+    const commandName = isAgentKit ? `ak-${skillName}` : skillName;
+    const commandPath = skillPath
+      .replace("/skills/", "/commands/")
+      .replace(`/${skillName}`, `/${commandName}.md`);
+
+    if (!existsSync(commandPath)) {
+      if (isAgentKit) {
+        result.warnings.push(
+          `No slash command found. Expected: ${commandPath.split("/").pop()}`
+        );
+        result.warnings.push(
+          "agent-kit commands must use 'ak-' prefix: ak-{skill-name}.md"
+        );
+      } else {
+        result.warnings.push(
+          `No slash command found at ${commandPath.split("/").pop()}`
+        );
+      }
+    } else {
+      // Verify command references the skill
+      const commandContent = readFileSync(commandPath, "utf-8");
+      if (!commandContent.includes(`@skills/${skillName}/SKILL.md`) &&
+          !commandContent.includes(`skills/${skillName}/SKILL.md`)) {
+        result.warnings.push("Command does not reference the skill's SKILL.md");
+      }
+      result.stats.files.push(`command: ${commandPath.split("/").pop()}`);
+    }
+
+    // Check for commands without ak- prefix in content/commands
+    if (isAgentKit) {
+      const commandsDir = skillPath.replace("/skills/" + skillName, "/commands");
+      if (existsSync(commandsDir)) {
+        const commandFiles = readdirSync(commandsDir);
+        for (const file of commandFiles) {
+          if (file.endsWith(".md") && !file.startsWith("ak-") && !file.startsWith(".")) {
+            result.warnings.push(
+              `Command '${file}' in content/commands/ should use 'ak-' prefix`
+            );
+          }
+        }
+      }
+    }
+  }
+
   // ─── Metadata Suggestions ──────────────────────────────────────────────────
 
   if (!frontmatter.license) {
