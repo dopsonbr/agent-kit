@@ -4,7 +4,7 @@ description: Review implementation work at checkpoints during plan execution. Us
 license: MIT
 metadata:
   author: agent-kit
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # Review Implementation
@@ -25,6 +25,34 @@ Provide quality gates during plan execution by:
 - At the end of plan execution (mandatory)
 - When manually checking implementation progress
 - Before merging implementation work
+
+## CRITICAL: Third-Party Review Required
+
+**This skill MUST delegate to Codex CLI.** The review cannot be performed by the agent that implemented the code - an independent third-party model must validate the work.
+
+Why third-party review matters:
+- Catches blind spots the implementer missed
+- Validates implementation against plan specifications
+- Provides independent verification of code quality
+- Reduces confirmation bias in self-review
+
+**If Codex CLI is not available, inform the user and do not proceed with a self-review.**
+
+## Codex CLI Invocation
+
+The correct way to invoke Codex for non-interactive review:
+
+```bash
+cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+<review prompt here>
+PROMPT
+```
+
+**Key details:**
+- Use `codex exec` for non-interactive mode (not bare `codex`)
+- Use `-m gpt-5.1-codex-max` for high-reasoning model
+- Pipe prompt via stdin with `-` flag (required for non-TTY environments)
+- Use heredoc with `'PROMPT'` (quoted) to prevent variable expansion
 
 ## Review Scopes
 
@@ -95,39 +123,75 @@ Read the plan to understand:
 - Verification commands specified
 - Testing strategy requirements
 
-### Step 3: Analyze Changes
+### Step 3: Verify Codex Available
 
-Compare actual changes against plan expectations:
+**MANDATORY:** You must invoke Codex CLI. Do not perform the review yourself.
 
-| Expected | Actual | Status |
-|----------|--------|--------|
-| CREATE `src/auth.ts` | File created | ✅ |
-| MODIFY `src/index.ts` | File modified | ✅ |
-| Add 3 tests | 4 tests added | ✅ |
+```bash
+which codex || echo "Codex CLI not installed"
+```
 
-### Step 4: Code Quality Check
+If not available, stop and inform the user they need to install Codex CLI.
 
-Review the implementation for:
+### Step 4: Invoke Codex Review
 
-**Correctness**
-- Logic matches specification
-- Edge cases handled
-- Error handling present
+Build the review prompt based on scope and invoke Codex using stdin:
 
-**Code Quality**
-- Follows project patterns
-- No obvious bugs
-- Readable and maintainable
+**For Phase Review:**
 
-**Testing**
-- Tests cover the changes
-- Tests are meaningful (not just coverage)
-- Edge cases tested
+```bash
+cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the implementation for Phase {N} of plan {plan-path}
 
-**Security**
-- No hardcoded secrets
-- Input validation present
-- No obvious vulnerabilities
+Changes to review:
+{git diff output or file list}
+
+Check against these criteria:
+1. Task Completion - Did all tasks complete as specified?
+2. Code Quality - Follows project patterns? No obvious bugs?
+3. Test Coverage - Tests adequate and meaningful?
+4. Security - No hardcoded secrets? Input validation present?
+5. Regressions - Any breaking changes introduced?
+
+Provide:
+1. PASS/NEEDS_REVISION/FAIL verdict
+2. Summary of findings
+3. Specific issues with severity (HIGH/MEDIUM/LOW)
+4. Recommended fixes
+PROMPT
+```
+
+**For Plan Review:**
+
+```bash
+cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the complete implementation of plan {plan-path}
+
+All commits in this execution:
+{git log output}
+
+Files changed:
+{git diff --stat output}
+
+Check against these criteria:
+1. All Phases Complete - Every task in every phase done?
+2. Test Coverage - Adequate tests for all changes?
+3. Code Quality - Consistent patterns? Maintainable?
+4. Documentation - Updated where needed?
+5. No Regressions - All existing tests still pass?
+
+Provide:
+1. PASS/NEEDS_REVISION/FAIL verdict
+2. Summary of findings
+3. Specific issues with severity (HIGH/MEDIUM/LOW)
+4. Recommended fixes
+PROMPT
+```
+
+**Important:** Let Codex read the files itself - it has filesystem access. This allows it to:
+- Verify implementation matches plan specifications
+- Check code patterns against existing codebase
+- Validate test coverage is meaningful
 
 ### Step 5: Run Verification
 
@@ -139,7 +203,7 @@ bun run typecheck
 bun run lint
 ```
 
-### Step 6: Generate Report
+### Step 6: Compile Review Report
 
 Output a structured review report:
 
@@ -148,6 +212,7 @@ Output a structured review report:
 
 **Plan:** {plan-name}
 **Scope:** Phase {N} | Full Plan | Diff
+**Reviewed by:** Codex (gpt-5.1-codex-max)
 **Verdict:** PASS | NEEDS_REVISION | FAIL
 
 ### Summary
@@ -276,10 +341,23 @@ The plan-execute skill will:
 ```
 /review-implementation --scope phase --phase 1
 
+Claude: I'll review Phase 1 using Codex CLI for independent validation.
+
+[Runs: which codex]
+/opt/homebrew/bin/codex
+
+[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the implementation for Phase 1 of plan docs/plans/0042_user-auth.md
+...
+PROMPT]
+
+Codex returned:
+
 ## Implementation Review: Phase 1
 
 **Plan:** 0042_user-auth
 **Scope:** Phase 1
+**Reviewed by:** Codex (gpt-5.1-codex-max)
 **Verdict:** PASS
 
 ### Summary
@@ -304,8 +382,18 @@ All tasks complete, tests passing, no issues found.
 ```
 /review-implementation --scope phase --phase 2
 
+Claude: I'll review Phase 2 using Codex CLI.
+
+[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the implementation for Phase 2 of plan docs/plans/0042_user-auth.md
+...
+PROMPT]
+
+Codex returned:
+
 ## Implementation Review: Phase 2
 
+**Reviewed by:** Codex (gpt-5.1-codex-max)
 **Verdict:** NEEDS_REVISION
 
 ### Issues Found
@@ -326,9 +414,19 @@ All tasks complete, tests passing, no issues found.
 ```
 /review-implementation --scope plan
 
+Claude: I'll perform the final plan review using Codex CLI.
+
+[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the complete implementation of plan docs/plans/0042_user-auth.md
+...
+PROMPT]
+
+Codex returned:
+
 ## Implementation Review: Full Plan
 
 **Plan:** 0042_user-auth
+**Reviewed by:** Codex (gpt-5.1-codex-max)
 **Verdict:** PASS
 
 ### Summary
@@ -353,6 +451,24 @@ all verification passing.
 - [x] Documentation updated
 
 **Ready to merge.**
+```
+
+### Example: Codex not available
+
+```
+/review-implementation --scope plan
+
+Claude: I need to invoke Codex CLI for third-party review.
+
+[Runs: which codex]
+codex not found
+
+I cannot proceed with the review. This skill requires Codex CLI
+for independent third-party validation. Please install it:
+
+  npm install -g @openai/codex
+
+Then run /review-implementation again.
 ```
 
 ## Related Skills
