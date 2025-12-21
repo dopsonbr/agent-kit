@@ -1,3 +1,67 @@
+---
+archived: true
+archived_date: 2025-12-20
+archived_by: ak-merge-archive-plan
+status: COMPLETE
+---
+
+## Archive Information
+
+| Field | Value |
+|-------|-------|
+| Archived | 2025-12-20 |
+| PR | N/A (direct to main) |
+| Branch | `main` |
+| Commits | 24 commits |
+| Files Changed | 91 files (+14843 -55) |
+
+### Implementation Commits
+
+```
+a209684 docs(plan): mark 0001_bootstrap as COMPLETE
+7a3ee01 fix(skills): correct codex review argument usage
+989cc43 feat(skills): add merge-archive-plan skill
+c18fc47 fix(skills): use codex review command instead of codex exec
+2f17cd4 feat(skills): add Codex CLI delegation to review-implementation
+a38476a test: add config and setup tests
+a287e87 chore: migrate from eslint/prettier to oxc
+2cbe886 fix: address codex review feedback and update review-plan skill
+8035275 feat(skills): add plan-execute and review-implementation skills
+2aa6eea docs(plan): add 0001_bootstrap and 0002_cli-core plans
+7ba24f4 archive initial plans and fix some skill & cmd namespace conflicts
+bec5b6e feat(skills): add ak- prefix requirement and conflict detection
+b0d3330 refactor(skills): rename create-plan to plan-create
+fd5bb1c feat(create-plan): add auto-commit and review-plan prompt
+196c9bd feat(skills): add slash command creation and validation
+5b311b5 feat(create-plan): add implementation planning skill with validation
+ebf2eaa move standards to correct dir
+f2b556f add some standards
+25cab44 feat(doc-contents): simplify templates and add validation script
+917078b feat(dev): add dogfooding setup with symlinks
+3d3effa feat(skills): add skill-creator skill and /create-skill command
+3f25cc3 refactor(content): bundle templates inside skills
+98d92a9 feat(presets): add custom preset support
+92a58fa feat(cli): add preset system for init command
+```
+
+### Execution Summary
+
+**Duration:** 2025-12-20
+**Phases:** 5 phases, all tasks completed
+
+Bootstrap plan established project foundation: Bun project with TypeScript, oxc linting/formatting, source directory structure, self-hosting (dogfooding) setup with symlinks, and testing foundation.
+
+### Lessons Learned
+
+**What Went Well:**
+- oxc migration simplified tooling compared to ESLint/Prettier
+- Symlink-based dogfooding allows immediate skill testing
+
+**Recommendations:**
+- Continue using this structure for subsequent phases
+
+---
+
 # 0001_bootstrap
 
 **Status:** COMPLETE

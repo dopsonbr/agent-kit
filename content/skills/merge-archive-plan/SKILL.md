@@ -106,58 +106,30 @@ git diff --stat {first-commit}^..{last-commit}
 
 ### Step 4: Update Plan with Archive Header
 
-Add archive metadata block at the top of the plan:
+**Use the Edit tool** to prepend the archive metadata block at the top of the plan file. Do NOT create a new file - edit the existing plan in place.
 
-```markdown
----
-archived: true
-archived_date: {YYYY-MM-DD}
-archived_by: {user or "plan-execute"}
----
+See [assets/archive-header-template.md](assets/archive-header-template.md) for the full template.
 
-## Archive Information
+### Step 5: Move to Archive with git mv
 
-| Field | Value |
-|-------|-------|
-| Archived | {YYYY-MM-DD HH:MM} |
-| PR | [{PR title}]({PR URL}) |
-| Merged | {merge date} |
-| Commits | {N} commits |
-| Files Changed | {N} files |
-
-### Commits
-
-```
-{hash} {message}
-{hash} {message}
-...
-```
-
-### Execution Summary
-
-{Brief summary of how execution went}
-
-### Lessons Learned
-
-{Any insights, issues encountered, or improvements for future plans}
-
----
-
-{Original plan content follows}
-```
-
-### Step 5: Move to Archive
+**Use `git mv` to move the plan** - this preserves git history and stages the change in one step.
 
 ```bash
 # Ensure archive directory exists
 mkdir -p docs/plans/archive/
 
-# Move the plan
-mv docs/plans/{NNNN}_{name}.md docs/plans/archive/
+# Move the plan using git mv (preserves history)
+git mv docs/plans/{NNNN}_{name}.md docs/plans/archive/
 
 # Move any subplans
-mv docs/plans/{NNNN}A_*.md docs/plans/archive/ 2>/dev/null
-mv docs/plans/{NNNN}B_*.md docs/plans/archive/ 2>/dev/null
+git mv docs/plans/{NNNN}A_*.md docs/plans/archive/ 2>/dev/null || true
+git mv docs/plans/{NNNN}B_*.md docs/plans/archive/ 2>/dev/null || true
+```
+
+**Example:**
+```bash
+mkdir -p docs/plans/archive/
+git mv docs/plans/0001_bootstrap.md docs/plans/archive/
 ```
 
 ### Step 6: Commit Archive
