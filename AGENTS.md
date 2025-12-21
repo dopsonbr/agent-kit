@@ -46,7 +46,7 @@ bun run lint         # Lint code
 ## Code Style
 
 - TypeScript strict mode
-- ESLint + Prettier
+- oxlint + oxfmt (https://oxc.rs) - faster than ESLint/Prettier
 - Conventional commits (feat:, fix:, chore:, etc.)
 - No semicolons, single quotes
 - Functional patterns preferred

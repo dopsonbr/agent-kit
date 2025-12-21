@@ -4,7 +4,7 @@ description: Critically review implementation plans before execution. Use when v
 license: MIT
 metadata:
   author: agent-kit
-  version: "1.0.0"
+  version: "2.0.0"
 ---
 
 # Review Plan
@@ -26,15 +26,33 @@ Validate implementation plans to ensure they:
 - When reviewing someone else's plan
 - To validate plan updates or changes
 
-## Delegation
+## CRITICAL: Third-Party Review Required
 
-This skill delegates to Codex CLI for deep reasoning analysis:
+**This skill MUST delegate to Codex CLI.** The review cannot be performed by the agent creating the plan - an independent third-party model must validate the work.
+
+Why third-party review matters:
+- Catches blind spots the author missed
+- Validates assumptions against actual codebase state
+- Provides independent verification of feasibility
+- Reduces confirmation bias in self-review
+
+**If Codex CLI is not available, inform the user and do not proceed with a self-review.**
+
+## Codex CLI Invocation
+
+The correct way to invoke Codex for non-interactive review:
 
 ```bash
-codex -m gpt-5.1-codex-max "<review prompt>"
+cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+<review prompt here>
+PROMPT
 ```
 
-The Codex model provides extended thinking capabilities for thorough plan analysis.
+**Key details:**
+- Use `codex exec` for non-interactive mode (not bare `codex`)
+- Use `-m gpt-5.1-codex-max` for high-reasoning model
+- Pipe prompt via stdin with `-` flag (required for non-TTY environments)
+- Use heredoc with `'PROMPT'` (quoted) to prevent variable expansion
 
 ## Workflow
 
@@ -60,55 +78,43 @@ Before invoking Codex, gather relevant context:
 
 ### Step 3: Invoke Codex Review
 
-Build a comprehensive review prompt and invoke Codex:
+**MANDATORY:** You must invoke Codex CLI. Do not perform the review yourself.
+
+First, verify Codex is available:
 
 ```bash
-codex -m gpt-5.1-codex-max "
-You are reviewing an implementation plan for a software project.
+which codex || echo "Codex CLI not installed"
+```
 
-## Plan to Review
-<paste plan content>
+If not available, stop and inform the user they need to install Codex CLI.
 
-## Project Standards
-<paste relevant standards>
+Build the review prompt and invoke Codex using stdin:
 
-## Review Criteria
-Critically evaluate this plan against these criteria:
+```bash
+cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the implementation plan at {plan-path}
 
-### 1. Logical Coherence
-- Do the phases and tasks flow logically?
-- Are dependencies between tasks correct?
-- Are there any circular dependencies or impossible orderings?
+Check against these criteria:
+1. Logical Coherence - Do phases flow logically? Dependencies correct?
+2. Completeness - All steps included? Testing strategy adequate?
+3. Standards Compliance - Follows project conventions?
+4. Feasibility - File paths correct? Referenced files exist?
+5. Risk Assessment - What could go wrong?
 
-### 2. Completeness
-- Are all necessary steps included?
-- Is the testing strategy adequate (automated + manual)?
-- Are rollback/failure scenarios considered?
-
-### 3. Standards Compliance
-- Does the plan follow project coding standards?
-- Are naming conventions correct?
-- Does architecture align with project patterns?
-
-### 4. Feasibility
-- Are time estimates realistic?
-- Are the file paths and structures correct?
-- Do referenced files/modules exist?
-
-### 5. Risk Assessment
-- What could go wrong during implementation?
-- Are there any security concerns?
-- Are there breaking changes that need migration?
-
-## Output Format
-Provide a structured review with:
+Provide:
 1. PASS/FAIL/NEEDS_REVISION verdict
 2. Summary of findings
-3. Specific issues (if any) with severity
+3. Specific issues with severity (HIGH/MEDIUM/LOW)
 4. Recommended changes
-5. Questions for the plan author
-"
+PROMPT
 ```
+
+**Important:** Let Codex read the plan file itself - it has filesystem access. This allows it to:
+- Verify file paths mentioned in the plan actually exist
+- Check referenced modules and their exports
+- Validate assumptions about codebase state
+
+**Do NOT paste plan content into the prompt** - this wastes tokens and prevents Codex from exploring the codebase.
 
 ### Step 4: Compile Review Report
 
@@ -172,41 +178,53 @@ The review checks against:
 ```
 User: Review the plan at docs/plans/0042_user-auth.md
 
-Claude: [Reads plan file]
-[Loads relevant standards based on plan content]
-[Invokes Codex with review prompt]
+Claude: I'll review this plan using Codex CLI for independent validation.
 
-Plan Review: 0042_user-auth
+[Runs: which codex]
+/opt/homebrew/bin/codex
+
+[Runs: cat <<'PROMPT' | codex exec -m gpt-5.1-codex-max -
+Review the implementation plan at docs/plans/0042_user-auth.md
+...
+PROMPT]
+
+Codex returned:
 
 Verdict: NEEDS_REVISION
 
 Summary: The plan is well-structured but missing integration tests
 and has an incorrect dependency ordering in Phase 3.
 
-Issues Found:
-| Severity | Issue | Location | Recommendation |
-|----------|-------|----------|----------------|
-| HIGH | Missing integration tests | Testing Strategy | Add API integration tests |
-| MEDIUM | Task 3.2 depends on 3.4 | Phase 3 | Reorder tasks |
+Issues:
+- HIGH — Missing integration tests (Testing Strategy section)
+- MEDIUM — Task 3.2 depends on 3.4 but is ordered before it (Phase 3)
 
-Recommendation: Address HIGH severity issue before implementation.
+Recommended changes:
+- Add API integration tests to Testing Strategy
+- Reorder Phase 3 tasks so 3.4 comes before 3.2
+
+---
+
+Based on Codex's review, you should address the HIGH severity issue
+before proceeding with implementation.
 ```
 
-### Example: Review current plan in context
+### Example: Codex not available
 
 ```
-User: Review this plan before I implement it
+User: Review the plan
 
-Claude: [Uses plan from current conversation context]
-[Gathers standards and explores codebase]
-[Invokes Codex review]
+Claude: I need to invoke Codex CLI for third-party review.
 
-Plan Review: Current Context Plan
+[Runs: which codex]
+codex not found
 
-Verdict: PASS
+I cannot proceed with the review. This skill requires Codex CLI
+for independent third-party validation. Please install it:
 
-Summary: Plan is well-structured and ready for implementation.
-Minor suggestion to add E2E test for the happy path.
+  npm install -g @openai/codex
+
+Then run /review-plan again.
 ```
 
 ## Output

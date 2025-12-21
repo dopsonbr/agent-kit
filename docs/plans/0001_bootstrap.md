@@ -127,8 +127,8 @@ Update package.json scripts:
     "format:check": "oxfmt --check ."
   },
   "devDependencies": {
-    "oxlint": "latest",
-    "oxfmt": "latest"
+    "oxlint": "^0.16.0",
+    "oxfmt": "^0.1.0"
   }
 }
 ```
@@ -136,7 +136,7 @@ Update package.json scripts:
 **Verification:**
 
 ```bash
-bun add -D oxlint oxfmt
+bun add -D oxlint@^0.16.0 oxfmt@^0.1.0
 bun run lint
 bun run format:check
 ```
@@ -224,28 +224,28 @@ All dogfooding setup complete.
 
 ```typescript
 // tests/lib/config.test.ts
-import { describe, it, expect, beforeEach, afterEach } from "bun:test"
-import { mkdtempSync, rmSync } from "fs"
-import { join } from "path"
-import { tmpdir } from "os"
-import { loadConfig, saveConfig, DEFAULT_CONFIG } from "../../src/lib/config"
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
+import { mkdtempSync, rmSync } from 'fs'
+import { join } from 'path'
+import { tmpdir } from 'os'
+import { loadConfig, saveConfig, DEFAULT_CONFIG } from '../../src/lib/config'
 
-describe("Config", () => {
+describe('Config', () => {
   let tempDir: string
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "ak-test-"))
+    tempDir = mkdtempSync(join(tmpdir(), 'ak-test-'))
   })
 
   afterEach(() => {
     rmSync(tempDir, { recursive: true })
   })
 
-  it("returns null when no config exists", () => {
+  it('returns null when no config exists', () => {
     expect(loadConfig(tempDir)).toBeNull()
   })
 
-  it("saves and loads config", () => {
+  it('saves and loads config', () => {
     saveConfig(DEFAULT_CONFIG, tempDir)
     const loaded = loadConfig(tempDir)
     expect(loaded).toEqual(DEFAULT_CONFIG)
@@ -255,24 +255,24 @@ describe("Config", () => {
 
 ```typescript
 // tests/setup.test.ts
-import { describe, it, expect } from "bun:test"
-import { existsSync } from "fs"
+import { describe, it, expect } from 'bun:test'
+import { existsSync } from 'fs'
 
-describe("Project Setup", () => {
-  it("has required config files", () => {
-    expect(existsSync("package.json")).toBe(true)
-    expect(existsSync("tsconfig.json")).toBe(true)
+describe('Project Setup', () => {
+  it('has required config files', () => {
+    expect(existsSync('package.json')).toBe(true)
+    expect(existsSync('tsconfig.json')).toBe(true)
   })
 
-  it("has source directories", () => {
-    expect(existsSync("src/cli")).toBe(true)
-    expect(existsSync("src/lib")).toBe(true)
-    expect(existsSync("src/types")).toBe(true)
+  it('has source directories', () => {
+    expect(existsSync('src/cli')).toBe(true)
+    expect(existsSync('src/lib')).toBe(true)
+    expect(existsSync('src/types')).toBe(true)
   })
 
-  it("has dogfooding setup", () => {
-    expect(existsSync("AGENTS.md")).toBe(true)
-    expect(existsSync(".claude/settings.json")).toBe(true)
+  it('has dogfooding setup', () => {
+    expect(existsSync('AGENTS.md')).toBe(true)
+    expect(existsSync('.claude/settings.json')).toBe(true)
   })
 })
 ```

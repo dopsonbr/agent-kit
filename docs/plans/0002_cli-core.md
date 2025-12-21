@@ -22,9 +22,11 @@ Implement the core CLI with argument parsing, output utilities, command routing,
 
 ## Non-Goals
 
-- Full init implementation (Phase 2 plan)
-- Update command implementation (Phase 3 plan)
-- Doctor command enhancement (Phase 4 plan)
+- Full init implementation (Phase 2 plan) - **stub exists, shows UI only**
+- Update command implementation (Phase 3 plan) - **stub exists, shows warning**
+- Doctor command enhancement (Phase 4 plan) - **basic checks exist, enhancement deferred**
+
+**Note:** The architecture diagram includes init/update/doctor because stub handlers exist in `src/cli/commands/`. These stubs are routed but not fully functional.
 
 ---
 
@@ -166,43 +168,43 @@ Wires parser to router with top-level error handling.
 
 ```typescript
 // tests/cli/parser.test.ts
-import { describe, it, expect } from "bun:test"
-import { parseArgs } from "../../src/cli/parser"
+import { describe, it, expect } from 'bun:test'
+import { parseArgs } from '../../src/cli/parser'
 
-describe("CLI Argument Parser", () => {
-  it("parses command name", () => {
-    const args = parseArgs(["node", "ak", "init"])
-    expect(args.command).toBe("init")
+describe('CLI Argument Parser', () => {
+  it('parses command name', () => {
+    const args = parseArgs(['node', 'ak', 'init'])
+    expect(args.command).toBe('init')
   })
 
-  it("defaults to help when no command", () => {
-    const args = parseArgs(["node", "ak"])
-    expect(args.command).toBe("help")
+  it('defaults to help when no command', () => {
+    const args = parseArgs(['node', 'ak'])
+    expect(args.command).toBe('help')
   })
 
-  it("parses boolean flags", () => {
-    const args = parseArgs(["node", "ak", "init", "--yes"])
+  it('parses boolean flags', () => {
+    const args = parseArgs(['node', 'ak', 'init', '--yes'])
     expect(args.flags.yes).toBe(true)
   })
 
-  it("parses flag values", () => {
-    const args = parseArgs(["node", "ak", "init", "--preset", "minimal"])
-    expect(args.flags.preset).toBe("minimal")
+  it('parses flag values', () => {
+    const args = parseArgs(['node', 'ak', 'init', '--preset', 'minimal'])
+    expect(args.flags.preset).toBe('minimal')
   })
 
-  it("handles --help as help command", () => {
-    const args = parseArgs(["node", "ak", "--help"])
-    expect(args.command).toBe("help")
+  it('handles --help as help command', () => {
+    const args = parseArgs(['node', 'ak', '--help'])
+    expect(args.command).toBe('help')
   })
 
-  it("handles --version as version command", () => {
-    const args = parseArgs(["node", "ak", "--version"])
-    expect(args.command).toBe("version")
+  it('handles --version as version command', () => {
+    const args = parseArgs(['node', 'ak', '--version'])
+    expect(args.command).toBe('version')
   })
 
-  it("collects positional arguments", () => {
-    const args = parseArgs(["node", "ak", "help", "init"])
-    expect(args.positional).toEqual(["init"])
+  it('collects positional arguments', () => {
+    const args = parseArgs(['node', 'ak', 'help', 'init'])
+    expect(args.positional).toEqual(['init'])
   })
 })
 ```
@@ -225,34 +227,34 @@ bun test tests/cli/parser.test.ts
 
 ```typescript
 // tests/cli/e2e.test.ts
-import { describe, it, expect } from "bun:test"
-import { execSync } from "child_process"
+import { describe, it, expect } from 'bun:test'
+import { execSync } from 'child_process'
 
-describe("CLI E2E", () => {
+describe('CLI E2E', () => {
   const run = (args: string) =>
-    execSync(`bun run src/cli/index.ts ${args}`, { encoding: "utf-8" })
+    execSync(`bun run src/cli/index.ts ${args}`, { encoding: 'utf-8' })
 
-  it("shows version with --version", () => {
-    const output = run("--version")
-    expect(output).toContain("agent-kit")
+  it('shows version with --version', () => {
+    const output = run('--version')
+    expect(output).toContain('agent-kit')
     expect(output).toMatch(/\d+\.\d+\.\d+/)
   })
 
-  it("shows help with no args", () => {
-    const output = run("")
-    expect(output).toContain("Usage:")
-    expect(output).toContain("init")
+  it('shows help with no args', () => {
+    const output = run('')
+    expect(output).toContain('Usage:')
+    expect(output).toContain('init')
   })
 
-  it("shows command help", () => {
-    const output = run("help init")
-    expect(output).toContain("--preset")
+  it('shows command help', () => {
+    const output = run('help init')
+    expect(output).toContain('--preset')
   })
 
-  it("shows skills list", () => {
-    const output = run("help skills")
-    expect(output).toContain("brainstorm")
-    expect(output).toContain("create-plan")
+  it('shows skills list', () => {
+    const output = run('help skills')
+    // Check for skill section, not specific names (may change)
+    expect(output).toContain('Skills')
   })
 })
 ```
