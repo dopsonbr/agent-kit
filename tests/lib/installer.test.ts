@@ -3,7 +3,7 @@ import { existsSync, lstatSync, readlinkSync, readFileSync } from 'fs'
 import { join } from 'path'
 import { installSkills } from '../../src/lib/installer'
 import { DEFAULT_CONFIG } from '../../src/lib/config'
-import { setupTestDir, teardownTestDir, getTestDir } from '../helpers/harness'
+import { setupTestDir, teardownTestDir } from '../helpers/harness'
 import type { Skill } from '../../src/types'
 
 describe('Installer', () => {
@@ -83,7 +83,6 @@ Content here.`,
       })
 
       const claudeSkillPath = join(testDir, '.claude/skills/test-skill')
-      const githubSkillPath = join(testDir, '.github/skills/test-skill')
 
       expect(existsSync(claudeSkillPath)).toBe(true)
       expect(lstatSync(claudeSkillPath).isSymbolicLink()).toBe(true)

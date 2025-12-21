@@ -5,35 +5,35 @@
 import { mkdirSync, rmSync, existsSync } from 'fs'
 import { join, resolve } from 'path'
 
-const TEST_DIR = './test-output'
+// Capture absolute path at module load time (before any chdir)
+const PROJECT_ROOT = resolve(__dirname, '../..')
+const TEST_DIR = join(PROJECT_ROOT, 'test-output')
 
 /**
  * Sets up a clean test directory, removing any existing one first
  */
 export function setupTestDir(): string {
-  const testDir = resolve(TEST_DIR)
-  if (existsSync(testDir)) {
-    rmSync(testDir, { recursive: true })
+  if (existsSync(TEST_DIR)) {
+    rmSync(TEST_DIR, { recursive: true })
   }
-  mkdirSync(testDir, { recursive: true })
-  return testDir
+  mkdirSync(TEST_DIR, { recursive: true })
+  return TEST_DIR
 }
 
 /**
  * Tears down the test directory
  */
 export function teardownTestDir(): void {
-  const testDir = resolve(TEST_DIR)
-  if (existsSync(testDir)) {
-    rmSync(testDir, { recursive: true })
+  if (existsSync(TEST_DIR)) {
+    rmSync(TEST_DIR, { recursive: true })
   }
 }
 
 /**
- * Returns the path to the test directory
+ * Returns the absolute path to the test directory
  */
 export function getTestDir(): string {
-  return resolve(TEST_DIR)
+  return TEST_DIR
 }
 
 /**

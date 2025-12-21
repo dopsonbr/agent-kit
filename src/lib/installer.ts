@@ -16,7 +16,7 @@ export interface InstallOptions {
 }
 
 export async function installSkills(options: InstallOptions): Promise<void> {
-  const { cwd, config, skills, commands } = options;
+  const { cwd, config, skills, commands: _commands } = options;
 
   // Create directories
   const dirs = [
