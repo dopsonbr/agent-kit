@@ -204,7 +204,7 @@ Use the template from [assets/plan-template.md](assets/plan-template.md).
 
 Run the validation script:
 ```bash
-bun run content/skills/create-plan/scripts/validate-plan.ts docs/plans/{plan-file}.md
+bun run content/skills/plan-create/scripts/validate-plan.ts docs/plans/{plan-file}.md
 ```
 
 ### Phase 10: Commit Plan

@@ -66,7 +66,7 @@ Polish and completeness:
 ```
 User: Validate the create-plan skill
 
-Claude: [Reads content/skills/create-plan/SKILL.md]
+Claude: [Reads content/skills/plan-create/SKILL.md]
 [Runs validation checks]
 [Reports results]
 ```

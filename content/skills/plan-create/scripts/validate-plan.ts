@@ -5,7 +5,7 @@
  * Validates implementation plans against create-plan skill requirements.
  *
  * Usage:
- *   bun run content/skills/create-plan/scripts/validate-plan.ts <plan-file.md>
+ *   bun run content/skills/plan-create/scripts/validate-plan.ts <plan-file.md>
  *
  * Checks:
  *   - Token count (warn > 3000, error > 5000)

@@ -8,7 +8,7 @@ arguments:
 
 Use the create-plan skill to help the user create a structured implementation plan.
 
-Follow the create-plan skill instructions in @skills/create-plan/SKILL.md exactly.
+Follow the create-plan skill instructions in @skills/plan-create/SKILL.md exactly.
 
 Key steps:
 1. Ask clarifying questions about scope, boundaries, dependencies, and success criteria
@@ -22,9 +22,9 @@ Key steps:
 9. Offer to create a git worktree for implementation
 
 Use the templates from:
-- @skills/create-plan/assets/plan-template.md - For plan structure
-- @skills/create-plan/references/examples.md - For plan examples
-- @skills/create-plan/references/worktree-setup.md - For worktree guidance
+- @skills/plan-create/assets/plan-template.md - For plan structure
+- @skills/plan-create/references/examples.md - For plan examples
+- @skills/plan-create/references/worktree-setup.md - For worktree guidance
 
 If a feature description was provided, use it as the starting point. Otherwise, ask the user what they want to plan.
 

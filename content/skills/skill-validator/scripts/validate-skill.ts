@@ -6,7 +6,7 @@
  * 
  * Usage:
  *   bun run scripts/validate-skill.ts <skill-path>
- *   bun run scripts/validate-skill.ts content/skills/create-plan
+ *   bun run scripts/validate-skill.ts content/skills/plan-create
  *   bun run scripts/validate-skill.ts --all content/skills
  */
 
