@@ -1,11 +1,11 @@
 /**
  * Local installation utilities
- * 
- * TODO: Implement following Phase 2 plan
+ *
+ * Installs skills and commands to the project directory.
  */
 
-import { mkdirSync, writeFileSync, existsSync } from "fs";
-import { join } from "path";
+import { mkdirSync, writeFileSync, existsSync, symlinkSync } from "fs";
+import { join, relative, dirname } from "path";
 import type { Skill, Command, AkConfig } from "../types";
 
 export interface InstallOptions {
@@ -45,10 +45,22 @@ export async function installSkills(options: InstallOptions): Promise<void> {
     }
   }
 
-  // TODO: Create symlinks from .claude/skills to .github/skills
-  // TODO: Install commands to .claude/commands
+  // Create symlinks from .claude/skills to .github/skills
+  if (config.targets.claude && config.targets.copilot) {
+    for (const skill of skills) {
+      const claudeSkillPath = join(cwd, ".claude/skills", skill.name);
+      const githubSkillPath = join(cwd, ".github/skills", skill.name);
 
-  console.log(`Installed ${skills.length} skills, ${commands.length} commands`);
+      // Use relative path for symlink portability
+      const relativePath = relative(dirname(claudeSkillPath), githubSkillPath);
+
+      if (!existsSync(claudeSkillPath)) {
+        symlinkSync(relativePath, claudeSkillPath);
+      }
+    }
+  }
+
+  // TODO: Install commands to .claude/commands
 }
 
 export function createClaudeSettings(cwd: string, config: AkConfig): void {
