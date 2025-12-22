@@ -1,3 +1,57 @@
+---
+archived: true
+archived_date: 2025-12-21
+archived_by: plan-execute
+status: COMPLETE
+---
+
+## Archive Information
+
+| Field | Value |
+|-------|-------|
+| Archived | 2025-12-21 |
+| PR | N/A (direct to main) |
+| Branch | `main` |
+| Commits | 3 commits (Phase 5 execution) |
+| Files Changed | 2 files (+71 lines) |
+
+### Implementation Commits
+
+```
+1946d33 test(cli): add parser tests
+64c4af5 test(cli): add E2E tests
+a179e1e docs(plan): mark 0002_cli-core as COMPLETE
+```
+
+### Files Changed Summary
+
+| Action | Count | Examples |
+|--------|-------|----------|
+| Created | 2 | `tests/cli/parser.test.ts`, `tests/cli/e2e.test.ts` |
+| Modified | 0 | - |
+| Deleted | 0 | - |
+
+### Execution Summary
+
+**Duration:** 2025-12-21 (single session)
+**Phases:** 5 phases, 8 tasks total
+**Reviews:** 2 checkpoints passed (phase + final)
+
+Phases 1-4 (parser, output, commands, router) were completed in prior work. This execution completed Phase 5 (testing) by adding parser unit tests and CLI E2E tests. Codex CLI provided independent review validation.
+
+### Lessons Learned
+
+**What Went Well:**
+- Clear plan structure made execution straightforward
+- Parallel test development (parser + E2E) was efficient
+- Codex CLI review caught no issues - implementation matched spec
+
+**Recommendations:**
+- Consider adding more edge case tests for flag parsing (e.g., `--flag=value` syntax)
+- CLI tests could benefit from error case coverage
+
+---
+
 # 0002_cli-core
 
 **Status:** COMPLETE
