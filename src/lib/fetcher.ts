@@ -1,9 +1,11 @@
 /**
  * GitHub content fetcher
- * 
- * TODO: Implement following Phase 2 plan
+ *
+ * Fetches skills and commands from GitHub or local directory.
  */
 
+import { readdirSync, readFileSync, existsSync } from "fs";
+import { join } from "path";
 import type { Skill, Command } from "../types";
 
 const GITHUB_RAW_BASE = "https://raw.githubusercontent.com";
@@ -12,6 +14,8 @@ export interface FetchOptions {
   repo: string;
   branch: string;
   path: string;
+  useLocal?: boolean;
+  localPath?: string;
 }
 
 export function parseSkillMd(content: string): Skill {
@@ -61,13 +65,48 @@ export async function fetchFile(
   return response.text();
 }
 
-export async function fetchContent(_options: FetchOptions): Promise<{
+export async function fetchContent(options: FetchOptions): Promise<{
   skills: Skill[];
   commands: Command[];
 }> {
-  // TODO: Implement full fetching logic
-  // See docs/plans/phase-2-init-plan.md
-  
-  console.log("Fetching content (not yet implemented)");
+  if (options.useLocal) {
+    return fetchLocalContent(options.localPath || "content");
+  }
+  return fetchGitHubContent(options);
+}
+
+async function fetchLocalContent(basePath: string): Promise<{
+  skills: Skill[];
+  commands: Command[];
+}> {
+  const skillsPath = join(basePath, "skills");
+  const skills: Skill[] = [];
+
+  if (!existsSync(skillsPath)) {
+    return { skills: [], commands: [] };
+  }
+
+  const skillDirs = readdirSync(skillsPath, { withFileTypes: true })
+    .filter((d) => d.isDirectory())
+    .map((d) => d.name);
+
+  for (const name of skillDirs) {
+    const skillMdPath = join(skillsPath, name, "SKILL.md");
+    if (existsSync(skillMdPath)) {
+      const skillMd = readFileSync(skillMdPath, "utf-8");
+      skills.push(parseSkillMd(skillMd));
+    }
+  }
+
+  return { skills, commands: [] };
+}
+
+async function fetchGitHubContent(options: FetchOptions): Promise<{
+  skills: Skill[];
+  commands: Command[];
+}> {
+  // TODO: Implement GitHub API fetching
+  // For now, return empty results
+  console.log(`GitHub fetch not yet implemented for ${options.repo}`);
   return { skills: [], commands: [] };
 }

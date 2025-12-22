@@ -15,7 +15,12 @@
 
 import type { ParsedArgs } from "../parser";
 import { print, format, colors, symbols, printBox } from "../output";
-import { PRESETS, DEFAULT_PRESET, getPreset, listPresets, type Preset } from "../../types/presets";
+import { DEFAULT_PRESET, getPreset, listPresets, type Preset } from "../../types/presets";
+import { fetchContent } from "../../lib/fetcher";
+import { installSkills, createClaudeSettingsLocal, BUN_PERMISSIONS, NODE_PERMISSIONS, CODEX_PERMISSIONS } from "../../lib/installer";
+import { generateAgentsMd } from "../../lib/generator";
+import { saveConfig, DEFAULT_CONFIG } from "../../lib/config";
+import type { AkConfig } from "../../types";
 
 export async function initCommand(args: ParsedArgs): Promise<void> {
   // Handle --list-presets flag
@@ -47,6 +52,20 @@ export async function initCommand(args: ParsedArgs): Promise<void> {
     process.exit(1);
   }
 
+  const cwd = process.cwd();
+  const useLocal = args.flags.local === true;
+
+  // Build config from preset
+  const config: AkConfig = {
+    ...DEFAULT_CONFIG,
+    targets: preset.targets,
+    defaults: {
+      ...DEFAULT_CONFIG.defaults,
+      reviewTool: preset.defaults.reviewTool || DEFAULT_CONFIG.defaults.reviewTool,
+      planExecutionMode: preset.defaults.planExecutionMode || DEFAULT_CONFIG.defaults.planExecutionMode,
+    },
+  };
+
   // Interactive mode (unless --yes flag)
   if (!args.flags.yes && !args.flags.y) {
     print();
@@ -77,47 +96,69 @@ export async function initCommand(args: ParsedArgs): Promise<void> {
   print(format.title(`Initializing with "${preset.name}" preset`));
   print();
 
-  // Show what will be done
-  print(`${symbols.info} Preset: ${colors.bold(preset.name)} - ${preset.description}`);
-  print();
+  // Fetch skills
+  print(`${symbols.info} Fetching skills...`);
+  const { skills: allSkills } = await fetchContent({
+    repo: config.source.repo,
+    branch: config.source.branch,
+    path: config.source.path,
+    useLocal,
+  });
 
-  // Skills to install
-  print(colors.bold("Skills:"));
-  for (const skill of preset.skills) {
-    print(`  ${symbols.arrow} ${skill}`);
-  }
-  print();
+  // Filter skills based on preset
+  const skills = allSkills.filter((s) => preset.skills.includes(s.name));
+  print(format.success(`Found ${skills.length} skills for preset '${presetName}'`));
 
-  // Targets
-  print(colors.bold("Targets:"));
-  if (preset.targets.claude) print(`  ${symbols.check} Claude Code (.claude/skills/, .claude/commands/)`);
-  if (preset.targets.copilot) print(`  ${symbols.check} GitHub Copilot (.github/skills/)`);
-  if (preset.targets.agentsMd) print(`  ${symbols.check} AGENTS.md`);
-  print();
+  // Install skills
+  print(`${symbols.info} Installing skills...`);
+  await installSkills({ cwd, config, skills, commands: [] });
+  print(format.success("Skills installed"));
 
-  // Defaults
-  print(colors.bold("Configuration:"));
-  if (preset.defaults.reviewTool) {
-    print(`  ${symbols.info} Review tool: ${preset.defaults.reviewTool}`);
-  }
-  if (preset.defaults.planExecutionMode) {
-    print(`  ${symbols.info} Execution mode: ${preset.defaults.planExecutionMode}`);
-  }
-  print();
+  // Create Claude settings.local.json if claude target is enabled
+  if (config.targets.claude) {
+    print(`${symbols.info} Creating Claude permissions...`);
 
-  // Directories
-  if (preset.createDirs.length > 0) {
-    print(colors.bold("Directories:"));
-    for (const dir of preset.createDirs) {
-      print(`  ${symbols.arrow} ${dir}/`);
+    // Detect package manager and add appropriate permissions
+    const additionalAllow: string[] = [];
+
+    // Add runtime-specific permissions based on project detection
+    // For now, include common ones - could be smarter with package.json detection
+    additionalAllow.push(...BUN_PERMISSIONS);
+    additionalAllow.push(...NODE_PERMISSIONS);
+
+    // Add codex permissions if using codex for reviews
+    if (config.defaults.reviewTool === "codex") {
+      additionalAllow.push(...CODEX_PERMISSIONS);
     }
-    print();
+
+    createClaudeSettingsLocal(cwd, {
+      additionalAllow,
+      skills: preset.skills,
+    });
+    print(format.success("Created .claude/settings.local.json"));
   }
 
-  print(format.warning("Full installation not yet implemented"));
+  // Generate AGENTS.md if target is enabled
+  if (config.targets.agentsMd) {
+    print(`${symbols.info} Generating AGENTS.md...`);
+    generateAgentsMd(cwd, config, skills);
+    print(format.success("Created AGENTS.md"));
+  }
+
+  // Save configuration
+  saveConfig(config, cwd);
+  print(format.success("Created .ak/config.json"));
+
+  // Summary
   print();
-  print(`See ${format.command("docs/plans/phase-2-init-plan.md")} for implementation details.`);
-  print();
+  printBox("agent-kit initialized!", [
+    `Preset: ${preset.name}`,
+    `Skills: ${skills.length}`,
+    "",
+    "Next steps:",
+    "  ak doctor   - Check installation",
+    "  ak help     - See available commands",
+  ]);
 }
 
 function showPresetList(): void {

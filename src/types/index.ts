@@ -84,3 +84,13 @@ export interface CheckResult {
   message: string;
   details?: string;
 }
+
+export interface ClaudePermissions {
+  allow: string[];
+  deny: string[];
+  ask: string[];
+}
+
+export interface ClaudeSettingsLocal {
+  permissions: ClaudePermissions;
+}
