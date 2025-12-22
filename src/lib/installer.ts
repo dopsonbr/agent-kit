@@ -6,7 +6,7 @@
 
 import { mkdirSync, writeFileSync, existsSync, symlinkSync } from "fs";
 import { join, relative, dirname } from "path";
-import type { Skill, Command, AkConfig } from "../types";
+import type { Skill, Command, AkConfig, ClaudeSettingsLocal, ClaudePermissions } from "../types";
 
 export interface InstallOptions {
   cwd: string;
@@ -89,5 +89,142 @@ export function createClaudeSettings(cwd: string, config: AkConfig): void {
       reasoning: config.defaults.reviewReasoning,
     },
   };
+  writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
+}
+
+/**
+ * Default permissions for Claude Code settings.local.json
+ * These are pre-approved tools that won't require user confirmation
+ */
+export const DEFAULT_PERMISSIONS: ClaudePermissions = {
+  allow: [
+    // Git operations
+    "Bash(git:*)",
+    "Bash(git add:*)",
+    "Bash(git commit:*)",
+    "Bash(git status:*)",
+    "Bash(git diff:*)",
+    "Bash(git log:*)",
+    "Bash(git branch:*)",
+    "Bash(git checkout:*)",
+    "Bash(git stash:*)",
+    "Bash(git fetch:*)",
+    "Bash(git pull:*)",
+    "Bash(git push:*)",
+    "Bash(git merge:*)",
+    "Bash(git rebase:*)",
+    "Bash(git worktree:*)",
+    "Bash(gh:*)",
+    // File exploration
+    "Bash(ls:*)",
+    "Bash(pwd:*)",
+    "Bash(cat:*)",
+    "Bash(head:*)",
+    "Bash(tail:*)",
+    "Bash(wc:*)",
+    "Bash(tree:*)",
+    "Bash(file:*)",
+    "Bash(which:*)",
+    // File operations
+    "Bash(mkdir:*)",
+    "Bash(cp:*)",
+    "Bash(mv:*)",
+    "Bash(rm:*)",
+    "Bash(touch:*)",
+    "Bash(chmod:*)",
+    "Bash(ln:*)",
+    // Search
+    "Bash(grep:*)",
+    "Bash(find:*)",
+    "Bash(sort:*)",
+    "Bash(uniq:*)",
+    "Bash(diff:*)",
+    "Bash(echo:*)",
+    // Web access
+    "WebSearch",
+    "WebFetch(domain:github.com)",
+  ],
+  deny: [],
+  ask: [
+    // Dangerous git operations require confirmation
+    "Bash(git push --force:*)",
+    "Bash(git push -f:*)",
+    "Bash(git reset --hard:*)",
+    "Bash(git clean -fd:*)",
+    "Bash(git clean -f:*)",
+    "Bash(rm -rf:*)",
+  ],
+};
+
+/**
+ * Node.js/npm permissions
+ */
+export const NODE_PERMISSIONS: string[] = [
+  "Bash(node:*)",
+  "Bash(npm:*)",
+  "Bash(npm run:*)",
+  "Bash(npm test:*)",
+  "Bash(npm install:*)",
+  "Bash(npx:*)",
+];
+
+/**
+ * Bun permissions
+ */
+export const BUN_PERMISSIONS: string[] = [
+  "Bash(bun:*)",
+  "Bash(bun run:*)",
+  "Bash(bun test:*)",
+  "Bash(bun install:*)",
+  "Bash(bun add:*)",
+  "Bash(bun remove:*)",
+];
+
+/**
+ * Codex CLI permissions
+ */
+export const CODEX_PERMISSIONS: string[] = [
+  "Bash(codex:*)",
+];
+
+/**
+ * Create .claude/settings.local.json with pre-approved permissions
+ */
+export function createClaudeSettingsLocal(
+  cwd: string,
+  options: {
+    permissions?: Partial<ClaudePermissions>;
+    additionalAllow?: string[];
+    skills?: string[];
+  } = {}
+): void {
+  const settingsDir = join(cwd, ".claude");
+  if (!existsSync(settingsDir)) {
+    mkdirSync(settingsDir, { recursive: true });
+  }
+
+  const settingsPath = join(settingsDir, "settings.local.json");
+
+  // Build permissions from defaults + options
+  const allow = [
+    ...DEFAULT_PERMISSIONS.allow,
+    ...(options.additionalAllow || []),
+  ];
+
+  // Add skill permissions if skills are provided
+  if (options.skills && options.skills.length > 0) {
+    for (const skill of options.skills) {
+      allow.push(`Skill(${skill})`);
+    }
+  }
+
+  const settings: ClaudeSettingsLocal = {
+    permissions: {
+      allow: [...new Set(allow)], // Dedupe
+      deny: options.permissions?.deny || DEFAULT_PERMISSIONS.deny,
+      ask: options.permissions?.ask || DEFAULT_PERMISSIONS.ask,
+    },
+  };
+
   writeFileSync(settingsPath, JSON.stringify(settings, null, 2));
 }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from 'bun:test'
 import { existsSync, lstatSync, readlinkSync, readFileSync } from 'fs'
 import { join } from 'path'
-import { installSkills } from '../../src/lib/installer'
+import { installSkills, createClaudeSettingsLocal, DEFAULT_PERMISSIONS, BUN_PERMISSIONS } from '../../src/lib/installer'
 import { DEFAULT_CONFIG } from '../../src/lib/config'
 import { setupTestDir, teardownTestDir } from '../helpers/harness'
 import type { Skill } from '../../src/types'
@@ -153,6 +153,88 @@ Content here.`,
       expect(existsSync(join(testDir, '.github/skills/skill-two/SKILL.md'))).toBe(true)
       expect(lstatSync(join(testDir, '.claude/skills/skill-one')).isSymbolicLink()).toBe(true)
       expect(lstatSync(join(testDir, '.claude/skills/skill-two')).isSymbolicLink()).toBe(true)
+    })
+  })
+
+  describe('createClaudeSettingsLocal', () => {
+    it('creates settings.local.json with default permissions', () => {
+      createClaudeSettingsLocal(testDir)
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      expect(existsSync(settingsPath)).toBe(true)
+
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+      expect(content.permissions).toBeDefined()
+      expect(content.permissions.allow).toBeInstanceOf(Array)
+      expect(content.permissions.deny).toBeInstanceOf(Array)
+      expect(content.permissions.ask).toBeInstanceOf(Array)
+    })
+
+    it('includes default git permissions', () => {
+      createClaudeSettingsLocal(testDir)
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+
+      expect(content.permissions.allow).toContain('Bash(git:*)')
+      expect(content.permissions.allow).toContain('Bash(git commit:*)')
+      expect(content.permissions.allow).toContain('Bash(git push:*)')
+    })
+
+    it('includes dangerous operations in ask list', () => {
+      createClaudeSettingsLocal(testDir)
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+
+      expect(content.permissions.ask).toContain('Bash(git push --force:*)')
+      expect(content.permissions.ask).toContain('Bash(rm -rf:*)')
+    })
+
+    it('adds additional permissions when provided', () => {
+      createClaudeSettingsLocal(testDir, {
+        additionalAllow: [...BUN_PERMISSIONS],
+      })
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+
+      expect(content.permissions.allow).toContain('Bash(bun:*)')
+      expect(content.permissions.allow).toContain('Bash(bun test:*)')
+    })
+
+    it('adds skill permissions when skills are provided', () => {
+      createClaudeSettingsLocal(testDir, {
+        skills: ['review-code', 'create-plan'],
+      })
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+
+      expect(content.permissions.allow).toContain('Skill(review-code)')
+      expect(content.permissions.allow).toContain('Skill(create-plan)')
+    })
+
+    it('deduplicates permissions', () => {
+      createClaudeSettingsLocal(testDir, {
+        additionalAllow: ['Bash(git:*)', 'Bash(git:*)', 'WebSearch'],
+      })
+
+      const settingsPath = join(testDir, '.claude/settings.local.json')
+      const content = JSON.parse(readFileSync(settingsPath, 'utf-8'))
+
+      const gitCount = content.permissions.allow.filter((p: string) => p === 'Bash(git:*)').length
+      expect(gitCount).toBe(1)
+    })
+
+    it('creates .claude directory if it does not exist', () => {
+      const claudeDir = join(testDir, '.claude')
+      expect(existsSync(claudeDir)).toBe(false)
+
+      createClaudeSettingsLocal(testDir)
+
+      expect(existsSync(claudeDir)).toBe(true)
+      expect(existsSync(join(claudeDir, 'settings.local.json'))).toBe(true)
     })
   })
 })

@@ -17,7 +17,7 @@ import type { ParsedArgs } from "../parser";
 import { print, format, colors, symbols, printBox } from "../output";
 import { DEFAULT_PRESET, getPreset, listPresets, type Preset } from "../../types/presets";
 import { fetchContent } from "../../lib/fetcher";
-import { installSkills } from "../../lib/installer";
+import { installSkills, createClaudeSettingsLocal, BUN_PERMISSIONS, NODE_PERMISSIONS, CODEX_PERMISSIONS } from "../../lib/installer";
 import { generateAgentsMd } from "../../lib/generator";
 import { saveConfig, DEFAULT_CONFIG } from "../../lib/config";
 import type { AkConfig } from "../../types";
@@ -113,6 +113,30 @@ export async function initCommand(args: ParsedArgs): Promise<void> {
   print(`${symbols.info} Installing skills...`);
   await installSkills({ cwd, config, skills, commands: [] });
   print(format.success("Skills installed"));
+
+  // Create Claude settings.local.json if claude target is enabled
+  if (config.targets.claude) {
+    print(`${symbols.info} Creating Claude permissions...`);
+
+    // Detect package manager and add appropriate permissions
+    const additionalAllow: string[] = [];
+
+    // Add runtime-specific permissions based on project detection
+    // For now, include common ones - could be smarter with package.json detection
+    additionalAllow.push(...BUN_PERMISSIONS);
+    additionalAllow.push(...NODE_PERMISSIONS);
+
+    // Add codex permissions if using codex for reviews
+    if (config.defaults.reviewTool === "codex") {
+      additionalAllow.push(...CODEX_PERMISSIONS);
+    }
+
+    createClaudeSettingsLocal(cwd, {
+      additionalAllow,
+      skills: preset.skills,
+    });
+    print(format.success("Created .claude/settings.local.json"));
+  }
 
   // Generate AGENTS.md if target is enabled
   if (config.targets.agentsMd) {
