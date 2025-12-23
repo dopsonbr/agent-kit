@@ -82,23 +82,26 @@ Create framework standards for Spring, React, Angular, and Bun by researching au
 
 ---
 
-## Phase 1: Complete Spring Standard
+## Phase 1: Complete Spring Standards
 
 **Prereqs:** 0004A, 0004B (provides content)
 
-### 1.1 Enrich Spring with Authoritative Sources
+### 1.1 Enrich Spring Topics with Authoritative Sources
 
 **Files:**
-- MODIFY: `content/standards/frameworks/spring.md`
+- MODIFY: `content/standards/frameworks/spring/architecture.md`
+- MODIFY: `content/standards/frameworks/spring/testing.md`
+- MODIFY: `content/standards/frameworks/spring/observability.md`
+- MODIFY: `content/standards/frameworks/spring/resiliency.md`
 
 **Implementation:**
 
 1. WebFetch Spring Boot Reference
-2. Add official patterns for:
-   - Configuration
-   - Testing (@SpringBootTest vs @WebFluxTest)
-   - Metrics and health endpoints
-3. Add source citations
+2. Enrich topic files with official patterns:
+   - `architecture.md` - Configuration, profiles, properties
+   - `testing.md` - @SpringBootTest vs @WebFluxTest
+   - `observability.md` - Metrics and health endpoints
+3. Add source citations to each topic file
 
 **Research Execution:**
 ```
@@ -109,27 +112,29 @@ WebFetch: https://projectreactor.io/docs/core/release/reference/#which-operator
 Prompt: "Extract Reactor operator selection patterns: when to use flatMap, concatMap, switchMap."
 ```
 
-**Commit:** `docs(standards): enrich spring with authoritative sources`
+**Commit:** `docs(standards): enrich spring topics with authoritative sources`
 
 ---
 
-## Phase 2: Complete React Standard
+## Phase 2: Complete React Standards
 
 **Prereqs:** 0004A, 0004B (provides content)
 
-### 2.1 Enrich React with Authoritative Sources
+### 2.1 Enrich React Topics with Authoritative Sources
 
 **Files:**
-- MODIFY: `content/standards/frameworks/react.md`
+- MODIFY: `content/standards/frameworks/react/components.md`
+- MODIFY: `content/standards/frameworks/react/state-management.md`
+- MODIFY: `content/standards/frameworks/react/testing.md`
 
 **Implementation:**
 
 1. WebFetch React.dev
-2. Add patterns for:
-   - Hooks usage (custom hooks)
-   - Component composition
-   - Performance optimization
-3. Add TanStack patterns
+2. Enrich topic files with official patterns:
+   - `components.md` - Hooks usage, custom hooks, component composition
+   - `state-management.md` - TanStack Query patterns, caching strategies
+   - Add performance optimization patterns where relevant
+3. Add source citations to each topic file
 
 **Research Execution:**
 ```
@@ -140,20 +145,29 @@ WebFetch: https://tanstack.com/query/latest/docs/framework/react/guides/queries
 Prompt: "Extract TanStack Query patterns: query keys, stale time, caching strategies."
 ```
 
-**Commit:** `docs(standards): enrich react with authoritative sources`
+**Commit:** `docs(standards): enrich react topics with authoritative sources`
 
 ---
 
-## Phase 3: Create Angular Standard
+## Phase 3: Create Angular Standards
 
 **Prereqs:** 0004A
 
-### 3.1 Create Angular Standard
+### 3.1 Create Angular Directory Structure
 
 **Files:**
-- CREATE: `content/standards/frameworks/angular.md`
+- CREATE: `content/standards/frameworks/angular/README.md`
+- CREATE: `content/standards/frameworks/angular/architecture.md`
+- CREATE: `content/standards/frameworks/angular/conventions.md`
+- CREATE: `content/standards/frameworks/angular/state-management.md`
+- CREATE: `content/standards/frameworks/angular/testing.md`
+- CREATE: `content/standards/frameworks/angular/observability.md`
 
 **Implementation:**
+
+1. Create `frameworks/angular/` directory
+2. Create README.md with index of all Angular topics
+3. Create topic files from research
 
 **Research Execution:**
 ```
@@ -167,63 +181,54 @@ WebFetch: https://ngrx.io/guide/store/walkthrough
 Prompt: "Extract NgRx patterns: selectors, effects, entity state."
 ```
 
-**Content Structure:**
-```markdown
-# Angular Standard
+**Content Structure (per topic file):**
 
-## Metadata
-| Field | Value |
-|-------|-------|
-| Category | `frameworks` |
-| Authoritative Sources | Angular.dev, Angular Style Guide, NgRx |
-| Last Updated | {today} |
-
-## Topics
-
-### Architecture
+`architecture.md`:
 - Module organization (standalone vs NgModules)
 - Feature module patterns
 - Lazy loading
 
-### Conventions
+`conventions.md`:
 - File naming
 - Component selectors
 - Service patterns
 
-### State Management
+`state-management.md`:
 - Signals vs Observables
 - NgRx patterns
 - Local vs global state
 
-### Testing
+`testing.md`:
 - Component testing
 - Service testing
 - E2E with Playwright
 
-### Observability
+`observability.md`:
 - Error handling with RxJS
 - Logging patterns
+- Performance (change detection, OnPush, trackBy)
 
-### Performance
-- Change detection
-- OnPush strategy
-- trackBy for ngFor
-```
-
-**Commit:** `docs(standards): create frameworks/angular`
+**Commit:** `docs(standards): create frameworks/angular/`
 
 ---
 
-## Phase 4: Create Bun Standard
+## Phase 4: Create Bun Standards
 
 **Prereqs:** 0004A
 
-### 4.1 Create Bun Standard
+### 4.1 Create Bun Directory Structure
 
 **Files:**
-- CREATE: `content/standards/frameworks/bun.md`
+- CREATE: `content/standards/frameworks/bun/README.md`
+- CREATE: `content/standards/frameworks/bun/architecture.md`
+- CREATE: `content/standards/frameworks/bun/conventions.md`
+- CREATE: `content/standards/frameworks/bun/testing.md`
 
 **Implementation:**
+
+1. Create `frameworks/bun/` directory
+2. Create README.md with index of all Bun topics
+3. Create topic files from research
 
 **Research Execution:**
 ```
@@ -237,40 +242,24 @@ WebSearch: "bun shell" patterns
 Prompt: "Extract Bun shell patterns: command execution, scripting."
 ```
 
-**Content Structure:**
-```markdown
-# Bun Standard
+**Content Structure (per topic file):**
 
-## Metadata
-| Field | Value |
-|-------|-------|
-| Category | `frameworks` |
-| Authoritative Sources | Bun.sh Docs |
-| Last Updated | {today} |
-
-## Topics
-
-### Architecture
+`architecture.md`:
 - Project structure
 - Package management (bun install)
 - Bundling
+- Performance (native APIs vs npm packages, memory management, startup optimization)
 
-### Conventions
+`conventions.md`:
 - bun.lockb handling
 - bunfig.toml patterns
 
-### Testing
+`testing.md`:
 - bun:test patterns
 - Mocking
 - Coverage
 
-### Performance
-- Native APIs vs npm packages
-- Memory management
-- Startup optimization
-```
-
-**Commit:** `docs(standards): create frameworks/bun`
+**Commit:** `docs(standards): create frameworks/bun/`
 
 ---
 
@@ -278,10 +267,12 @@ Prompt: "Extract Bun shell patterns: command execution, scripting."
 
 | Action | File | Purpose |
 |--------|------|---------|
-| MODIFY | `content/standards/frameworks/spring.md` | Enrich with sources |
-| MODIFY | `content/standards/frameworks/react.md` | Enrich with sources |
-| CREATE | `content/standards/frameworks/angular.md` | Angular patterns |
-| CREATE | `content/standards/frameworks/bun.md` | Bun runtime patterns |
+| MODIFY | `content/standards/frameworks/spring/*.md` | Enrich topic files with sources |
+| MODIFY | `content/standards/frameworks/react/*.md` | Enrich topic files with sources |
+| CREATE | `content/standards/frameworks/angular/README.md` | Angular topic index |
+| CREATE | `content/standards/frameworks/angular/*.md` | Angular topic files |
+| CREATE | `content/standards/frameworks/bun/README.md` | Bun topic index |
+| CREATE | `content/standards/frameworks/bun/*.md` | Bun topic files |
 
 ---
 

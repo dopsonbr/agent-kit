@@ -50,10 +50,27 @@ content/standards/
 │   └── css.md
 ├── frameworks/
 │   ├── README.md
-│   ├── spring.md
-│   ├── react.md
-│   ├── angular.md
-│   └── bun.md
+│   ├── spring/                        # Spring topics in separate files
+│   │   ├── README.md
+│   │   ├── architecture.md
+│   │   ├── error-handling.md
+│   │   ├── testing.md
+│   │   ├── observability.md
+│   │   ├── resiliency.md
+│   │   ├── caching.md
+│   │   └── security.md
+│   ├── react/                         # React topics in separate files
+│   │   ├── README.md
+│   │   ├── architecture.md
+│   │   ├── components.md
+│   │   ├── state-management.md
+│   │   ├── error-handling.md
+│   │   ├── testing.md
+│   │   └── observability.md
+│   ├── angular/
+│   │   └── README.md
+│   └── bun/
+│       └── README.md
 ├── protocols-transports/
 │   ├── README.md
 │   ├── rest.md

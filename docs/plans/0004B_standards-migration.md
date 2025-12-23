@@ -33,63 +33,71 @@ Migrate existing Java and React standards from backend/frontend structure to new
 
 | Current File | New Location | Category |
 |--------------|--------------|----------|
-| architecture.md | frameworks/spring.md | Frameworks |
+| architecture.md | frameworks/spring/architecture.md | Frameworks |
 | models.md | languages/java.md | Languages |
-| resiliency-*.md (4 files) | frameworks/spring.md | Frameworks |
-| observability-*.md (3 files) | frameworks/spring.md | Frameworks |
-| testing-*.md (3 files) | frameworks/spring.md | Frameworks |
-| error-handling.md | frameworks/spring.md | Frameworks |
+| resiliency-*.md (4 files) | frameworks/spring/resiliency.md | Frameworks |
+| observability-*.md (3 files) | frameworks/spring/observability.md | Frameworks |
+| testing-*.md (3 files) | frameworks/spring/testing.md | Frameworks |
+| error-handling.md | frameworks/spring/error-handling.md | Frameworks |
 | validation.md | data/data-validation.md | Data |
-| caching.md | frameworks/spring.md | Frameworks |
-| security.md | frameworks/spring.md | Frameworks |
+| caching.md | frameworks/spring/caching.md | Frameworks |
+| security.md | frameworks/spring/security.md | Frameworks |
 | events.md | protocols-transports/messaging.md | Protocols |
 
 ### React Standards (frontend/react/ → new locations)
 
 | Current File | New Location | Category |
 |--------------|--------------|----------|
-| architecture.md | frameworks/react.md | Frameworks |
-| components.md | frameworks/react.md | Frameworks |
-| code-organization.md | frameworks/react.md | Frameworks |
-| guiding-principles.md | frameworks/react.md | Frameworks |
+| architecture.md | frameworks/react/architecture.md | Frameworks |
+| components.md | frameworks/react/components.md | Frameworks |
+| code-organization.md | frameworks/react/architecture.md | Frameworks |
+| guiding-principles.md | frameworks/react/conventions.md | Frameworks |
 | design-tokens.md | languages/css.md | Languages |
-| state-management.md | frameworks/react.md | Frameworks |
-| error-handling.md | frameworks/react.md | Frameworks |
-| observability.md | frameworks/react.md | Frameworks |
-| testing.md | frameworks/react.md | Frameworks |
+| state-management.md | frameworks/react/state-management.md | Frameworks |
+| error-handling.md | frameworks/react/error-handling.md | Frameworks |
+| observability.md | frameworks/react/observability.md | Frameworks |
+| testing.md | frameworks/react/testing.md | Frameworks |
 
 ---
 
-## Phase 1: Create Spring Standard
+## Phase 1: Create Spring Standards
 
 **Prereqs:** 0004A complete
 
-### 1.1 Consolidate Java Backend into Spring
+### 1.1 Create Spring Directory Structure
 
 **Files:**
-- CREATE: `content/standards/frameworks/spring.md`
+- CREATE: `content/standards/frameworks/spring/README.md`
+- CREATE: `content/standards/frameworks/spring/architecture.md`
+- CREATE: `content/standards/frameworks/spring/error-handling.md`
+- CREATE: `content/standards/frameworks/spring/testing.md`
+- CREATE: `content/standards/frameworks/spring/observability.md`
+- CREATE: `content/standards/frameworks/spring/resiliency.md`
+- CREATE: `content/standards/frameworks/spring/caching.md`
+- CREATE: `content/standards/frameworks/spring/security.md`
 - READ: All `content/standards/backend/java/*.md` files
 
 **Implementation:**
 
-1. Read all Java standards files
-2. Create spring.md with template structure
-3. Organize content into Topics sections:
-   - Architecture (from architecture.md)
-   - Error Handling (from error-handling.md)
-   - Testing (from testing-*.md)
-   - Observability (from observability-*.md)
-   - Resiliency (from resiliency-*.md)
-   - Caching (from caching.md)
-   - Security (from security.md)
+1. Create `frameworks/spring/` directory
+2. Create README.md with index of all Spring topics
+3. Migrate each topic to its own file with template structure:
+   - `architecture.md` ← from backend/java/architecture.md
+   - `error-handling.md` ← from backend/java/error-handling.md
+   - `testing.md` ← consolidated from backend/java/testing-*.md (3 files)
+   - `observability.md` ← consolidated from backend/java/observability-*.md (3 files)
+   - `resiliency.md` ← consolidated from backend/java/resiliency-*.md (4 files)
+   - `caching.md` ← from backend/java/caching.md
+   - `security.md` ← from backend/java/security.md
 
-4. Add metadata:
+4. Each topic file includes metadata:
 ```markdown
 ## Metadata
 
 | Field | Value |
 |-------|-------|
-| Category | `frameworks` |
+| Category | `frameworks/spring` |
+| Topic | `{topic-name}` |
 | Authoritative Sources | Spring Framework Docs, Reactor Docs, Resilience4j |
 | Last Updated | {today} |
 ```
@@ -97,11 +105,16 @@ Migrate existing Java and React standards from backend/frontend structure to new
 **Verification:**
 
 ```bash
-wc -l content/standards/frameworks/spring.md
-# Expected: ~800-1200 lines (consolidated content)
+ls content/standards/frameworks/spring/
+# Expected: README.md + 7 topic files
+
+# Verify each file has content
+for f in content/standards/frameworks/spring/*.md; do
+  echo "$f: $(wc -l < "$f") lines"
+done
 ```
 
-**Commit:** `docs(standards): migrate Java backend to frameworks/spring`
+**Commit:** `docs(standards): migrate Java backend to frameworks/spring/`
 
 ---
 
@@ -156,37 +169,61 @@ grep -c "record" content/standards/languages/java.md
 
 ---
 
-## Phase 2: Create React Standard
+## Phase 2: Create React Standards
 
 **Prereqs:** 0004A complete
 
-### 2.1 Consolidate React Frontend
+### 2.1 Create React Directory Structure
 
 **Files:**
-- CREATE: `content/standards/frameworks/react.md`
+- CREATE: `content/standards/frameworks/react/README.md`
+- CREATE: `content/standards/frameworks/react/architecture.md`
+- CREATE: `content/standards/frameworks/react/components.md`
+- CREATE: `content/standards/frameworks/react/conventions.md`
+- CREATE: `content/standards/frameworks/react/state-management.md`
+- CREATE: `content/standards/frameworks/react/error-handling.md`
+- CREATE: `content/standards/frameworks/react/testing.md`
+- CREATE: `content/standards/frameworks/react/observability.md`
 - READ: All `content/standards/frontend/react/*.md` files
 
 **Implementation:**
 
-1. Read all React standards files
-2. Create react.md with template structure
-3. Organize content into Topics:
-   - Architecture (from architecture.md, code-organization.md)
-   - Conventions (from guiding-principles.md)
-   - Components (from components.md)
-   - State Management (from state-management.md)
-   - Error Handling (from error-handling.md)
-   - Testing (from testing.md)
-   - Observability (from observability.md)
+1. Create `frameworks/react/` directory
+2. Create README.md with index of all React topics
+3. Migrate each topic to its own file with template structure:
+   - `architecture.md` ← merged from frontend/react/architecture.md + code-organization.md
+   - `components.md` ← from frontend/react/components.md
+   - `conventions.md` ← from frontend/react/guiding-principles.md
+   - `state-management.md` ← from frontend/react/state-management.md
+   - `error-handling.md` ← from frontend/react/error-handling.md
+   - `testing.md` ← from frontend/react/testing.md
+   - `observability.md` ← from frontend/react/observability.md
+
+4. Each topic file includes metadata:
+```markdown
+## Metadata
+
+| Field | Value |
+|-------|-------|
+| Category | `frameworks/react` |
+| Topic | `{topic-name}` |
+| Authoritative Sources | React Docs, React TypeScript Cheatsheet |
+| Last Updated | {today} |
+```
 
 **Verification:**
 
 ```bash
-wc -l content/standards/frameworks/react.md
-# Expected: ~400-600 lines
+ls content/standards/frameworks/react/
+# Expected: README.md + 7 topic files
+
+# Verify each file has content
+for f in content/standards/frameworks/react/*.md; do
+  echo "$f: $(wc -l < "$f") lines"
+done
 ```
 
-**Commit:** `docs(standards): migrate React frontend to frameworks/react`
+**Commit:** `docs(standards): migrate React frontend to frameworks/react/`
 
 ---
 
@@ -372,8 +409,22 @@ ls content/standards/
 
 | Action | File | Purpose |
 |--------|------|---------|
-| CREATE | `content/standards/frameworks/spring.md` | Java/Spring patterns |
-| CREATE | `content/standards/frameworks/react.md` | React patterns |
+| CREATE | `content/standards/frameworks/spring/README.md` | Spring topic index |
+| CREATE | `content/standards/frameworks/spring/architecture.md` | Spring architecture patterns |
+| CREATE | `content/standards/frameworks/spring/error-handling.md` | Spring error handling |
+| CREATE | `content/standards/frameworks/spring/testing.md` | Spring testing patterns |
+| CREATE | `content/standards/frameworks/spring/observability.md` | Spring observability |
+| CREATE | `content/standards/frameworks/spring/resiliency.md` | Spring resiliency patterns |
+| CREATE | `content/standards/frameworks/spring/caching.md` | Spring caching patterns |
+| CREATE | `content/standards/frameworks/spring/security.md` | Spring security patterns |
+| CREATE | `content/standards/frameworks/react/README.md` | React topic index |
+| CREATE | `content/standards/frameworks/react/architecture.md` | React architecture patterns |
+| CREATE | `content/standards/frameworks/react/components.md` | React component patterns |
+| CREATE | `content/standards/frameworks/react/conventions.md` | React conventions/principles |
+| CREATE | `content/standards/frameworks/react/state-management.md` | React state management |
+| CREATE | `content/standards/frameworks/react/error-handling.md` | React error handling |
+| CREATE | `content/standards/frameworks/react/testing.md` | React testing patterns |
+| CREATE | `content/standards/frameworks/react/observability.md` | React observability |
 | CREATE | `content/standards/languages/java.md` | Java language patterns |
 | CREATE | `content/standards/languages/css.md` | CSS patterns |
 | CREATE | `content/standards/data/data-validation.md` | Validation patterns |
@@ -394,11 +445,12 @@ ls content/standards/
 
 ### Manual Validation
 
-1. Compare original Java standards with spring.md - verify no content lost
-2. Compare original React standards with react.md - verify no content lost
+1. Compare original Java standards with `frameworks/spring/*.md` - verify no content lost
+2. Compare original React standards with `frameworks/react/*.md` - verify no content lost
 3. Verify cross-references updated to new paths
-4. Confirm README and CODEX files archived to docs/archive/standards-legacy/
-5. Confirm old directories removed
+4. Verify each framework directory has README.md index
+5. Confirm README and CODEX files archived to docs/archive/standards-legacy/
+6. Confirm old directories removed
 
 ---
 
@@ -410,22 +462,22 @@ graph TD
         P1[0004A: Template]
     end
 
-    subgraph "Phase 1"
-        T1[1.1 Spring from Java]
+    subgraph "Phase 1: Spring"
+        T1[1.1 Spring Directory + Topics]
         T2[1.2 Java Language]
     end
 
-    subgraph "Phase 2"
-        T3[2.1 React Consolidation]
+    subgraph "Phase 2: React"
+        T3[2.1 React Directory + Topics]
         T4[2.2 CSS from Design Tokens]
     end
 
-    subgraph "Phase 3"
+    subgraph "Phase 3: Cross-Cutting"
         T5[3.1 Data Validation]
         T6[3.2 Messaging]
     end
 
-    subgraph "Phase 4"
+    subgraph "Phase 4: Cleanup"
         T7[4.1 Archive Unmigrated]
         T8[4.2 Remove Old Dirs]
     end
@@ -453,10 +505,11 @@ graph TD
 
 ## Checklist
 
-- [ ] Phase 1 complete (Spring + Java)
-- [ ] Phase 2 complete (React + CSS)
+- [ ] Phase 1 complete (Spring directory with 8 topic files + Java language)
+- [ ] Phase 2 complete (React directory with 8 topic files + CSS)
 - [ ] Phase 3 complete (Validation + Messaging)
 - [ ] Phase 4 complete (Archive + Cleanup)
+- [ ] Each framework directory has README.md index
 - [ ] README and CODEX files archived
 - [ ] No content lost in migration
 - [ ] All new files match template
