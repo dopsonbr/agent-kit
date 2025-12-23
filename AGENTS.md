@@ -125,6 +125,22 @@ agent-kit supports presets for different project needs:
 
 See `src/types/presets.ts` for preset definitions.
 
+## Worktree Convention
+
+**IMPORTANT:** All git worktrees MUST be created in `.worktrees/` directory.
+
+```bash
+# Correct - always use .worktrees/
+git worktree add .worktrees/0042_feature -b feature/0042_feature
+
+# Wrong - do not create worktrees outside the repo
+git worktree add ../project-0042 -b feature/0042_feature
+```
+
+Naming convention: `.worktrees/{NNNN}_{feature-name}` matching the plan number.
+
+See `content/skills/plan-create/references/worktree-setup.md` for details.
+
 ## Development Workflow
 
 1. Use `/brainstorm` to explore new features
