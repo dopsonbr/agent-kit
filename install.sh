@@ -1,40 +1,63 @@
 #!/usr/bin/env bash
-# install.sh - Bootstrap agent-kit installation
+# install.sh - Install agent-kit binary
 # Usage: curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash
 
 set -euo pipefail
 
-# Colors for output
+REPO="dopsonbr/agent-kit"
+INSTALL_DIR="${HOME}/.local/bin"
+BINARY_NAME="ak"
+
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+NC='\033[0m'
 
 info() { echo -e "${GREEN}▸${NC} $1"; }
 warn() { echo -e "${YELLOW}▸${NC} $1"; }
-error() { echo -e "${RED}✗${NC} $1" >&2; }
+error() { echo -e "${RED}✗${NC} $1" >&2; exit 1; }
+
+# Detect platform
+detect_platform() {
+  local os arch
+  os="$(uname -s)"
+  arch="$(uname -m)"
+
+  case "$os" in
+    Darwin)
+      case "$arch" in
+        arm64) echo "darwin-arm64" ;;
+        *) error "Unsupported architecture: $arch. Only Apple Silicon (arm64) is supported." ;;
+      esac
+      ;;
+    *)
+      error "Unsupported OS: $os. Only macOS is supported."
+      ;;
+  esac
+}
+
+# Get latest release version
+get_latest_version() {
+  curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" \
+    | grep '"tag_name":' \
+    | sed -E 's/.*"([^"]+)".*/\1/' \
+    || error "Failed to fetch latest version. Check if releases exist at https://github.com/${REPO}/releases"
+}
 
 # Parse arguments
-PRESET=""
-YES_FLAG=""
-
+VERSION=""
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --all)
-      PRESET="full"
-      YES_FLAG="--yes"
-      shift
-      ;;
-    --preset)
+    --version)
       if [[ -z "${2:-}" ]]; then
-        error "--preset requires a value (e.g., --preset claude)"
-        exit 1
+        error "--version requires a value (e.g., --version v1.0.0)"
       fi
-      PRESET="$2"
+      VERSION="$2"
       shift 2
       ;;
-    --yes|-y)
-      YES_FLAG="--yes"
+    --version=*)
+      VERSION="${1#*=}"
       shift
       ;;
     *)
@@ -43,21 +66,48 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-# Check for npx
-if ! command -v npx &> /dev/null; then
-  error "npx not found. Please install Node.js 18+ first."
-  echo "  brew install node    # macOS"
-  echo "  apt install nodejs   # Ubuntu/Debian"
-  exit 1
+# Detect platform
+PLATFORM=$(detect_platform)
+ASSET_NAME="ak-${PLATFORM}"
+
+# Get version (latest if not specified)
+if [[ -z "$VERSION" ]]; then
+  info "Fetching latest version..."
+  VERSION=$(get_latest_version)
 fi
 
-info "Installing agent-kit..."
+info "Installing agent-kit ${VERSION}..."
 
-# Run installation (avoid eval for security)
-if [[ -n "$PRESET" ]]; then
-  npx agent-kit@latest init --preset "$PRESET" $YES_FLAG
-else
-  npx agent-kit@latest init $YES_FLAG
+# Create install directory
+mkdir -p "$INSTALL_DIR"
+
+# Download binary
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${VERSION}/${ASSET_NAME}"
+info "Downloading from ${DOWNLOAD_URL}..."
+
+if ! curl -fsSL -o "${INSTALL_DIR}/${BINARY_NAME}" "$DOWNLOAD_URL"; then
+  error "Failed to download binary. Check if version ${VERSION} exists at https://github.com/${REPO}/releases"
+fi
+
+# Make executable
+chmod +x "${INSTALL_DIR}/${BINARY_NAME}"
+
+# Verify installation
+if ! "${INSTALL_DIR}/${BINARY_NAME}" --version >/dev/null 2>&1; then
+  error "Installation verification failed"
+fi
+
+INSTALLED_VERSION=$("${INSTALL_DIR}/${BINARY_NAME}" --version)
+info "Installed: ${INSTALLED_VERSION}"
+
+# Check if install directory is in PATH
+if [[ ":$PATH:" != *":${INSTALL_DIR}:"* ]]; then
+  warn "${INSTALL_DIR} is not in your PATH"
+  echo ""
+  echo "Add to your shell profile (~/.zshrc or ~/.bashrc):"
+  echo ""
+  echo "  export PATH=\"\$HOME/.local/bin:\$PATH\""
+  echo ""
 fi
 
 info "Done! Run 'ak help' to get started."
