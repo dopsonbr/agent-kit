@@ -9,20 +9,30 @@ A collection of battle-tested [Agent Skills](https://agentskills.io) for Claude 
 ## Quick Start
 
 ```bash
+# Install the ak CLI
 curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash
+
+# Initialize your project
+cd your-project
+ak init
 ```
 
-This installs skills, commands, and standards into your project's `.claude/` directory.
+The `ak` binary installs to `~/.local/bin/`. Add to your PATH if needed:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
 
 ## Installation Options
 
-### Install Everything
-
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash -s -- --all
+# Install specific version
+curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash -s -- --version v1.0.0
 ```
 
 ### Presets
+
+After installing, initialize your project with a preset:
 
 | Preset | Description |
 |--------|-------------|
@@ -37,8 +47,8 @@ curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh 
 | `execution` | Focus on autonomous execution |
 
 ```bash
-# Install with a specific preset
-curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash -s -- --preset claude
+# Initialize with a specific preset
+ak init --preset claude --yes
 ```
 
 ## What Gets Installed
