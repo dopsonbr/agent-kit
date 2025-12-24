@@ -26,6 +26,10 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --preset)
+      if [[ -z "${2:-}" ]]; then
+        error "--preset requires a value (e.g., --preset claude)"
+        exit 1
+      fi
       PRESET="$2"
       shift 2
       ;;
