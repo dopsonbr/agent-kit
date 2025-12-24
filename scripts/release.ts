@@ -70,7 +70,7 @@ async function main() {
   const binaryPath = `dist/${binaryName}`;
 
   info("Building standalone executable...");
-  await $`bun run build:standalone`;
+  await $`bun build src/cli/index.ts --compile --outfile dist/ak-darwin-arm64 --target bun-darwin-arm64`;
 
   // Verify binary exists
   const file = Bun.file(binaryPath);
