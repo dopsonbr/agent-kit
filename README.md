@@ -22,21 +22,24 @@ This installs skills, commands, and standards into your project's `.claude/` dir
 curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash -s -- --all
 ```
 
-### Choose What to Install
+### Presets
+
+| Preset | Description |
+|--------|-------------|
+| `standard` | Core skills for most projects (default) |
+| `full` | Everything included |
+| `minimal` | Just AGENTS.md |
+| `claude` | Optimized for Claude Code |
+| `copilot` | Optimized for GitHub Copilot |
+| `codex` | Optimized for OpenAI Codex CLI |
+| `planning` | Focus on design and docs |
+| `review` | Focus on code review |
+| `execution` | Focus on autonomous execution |
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash
+# Install with a specific preset
+curl -fsSL https://raw.githubusercontent.com/dopsonbr/agent-kit/main/install.sh | bash -s -- --preset claude
 ```
-
-Interactive menu lets you select from logical groups:
-
-| Group | Includes | Description |
-|-------|----------|-------------|
-| **Planning** | `create-plan`, `review-plan`, `merge-archive-plan` | Design before you build |
-| **Implementation** | `plan-execute`, `review-implementation` | Autonomous execution with reviews |
-| **Documentation** | `doc-contents`, `create-adr` | Keep docs in sync |
-| **Skills Development** | `skill-creator`, `skill-validator` | Create and validate new skills |
-| **Community** | `user-request`, `user-contribution` | Contribute back to agent-kit |
 
 ## What Gets Installed
 
@@ -118,7 +121,7 @@ Use the create-plan skill to design a caching layer
 - [x] Slash commands for Claude Code
 - [x] CLAUDE.md generation
 - [x] Skill validation
-- [x] Install script with selection menu
+- [x] Install script with presets
 
 ### 🚧 In Progress
 
