@@ -1,3 +1,58 @@
+---
+archived: true
+archived_date: 2025-12-24
+archived_by: plan-execute
+status: COMPLETE
+---
+
+## Archive Information
+
+| Field | Value |
+|-------|-------|
+| Archived | 2025-12-24 |
+| PR | N/A (direct to main) |
+| Branch | `main` |
+| Commits | 4 commits |
+| Files Changed | 3 files (+96 -29) |
+
+### Implementation Commits
+
+```
+fb5e7e6 feat: add install.sh bootstrap script
+faf71c1 docs: update README with preset-based installation
+5557975 fix(install): guard --preset flag for missing value
+b69a720 chore(plan): mark 0005_install-script complete
+```
+
+### Files Changed Summary
+
+| Action | Count | Examples |
+|--------|-------|----------|
+| Created | 1 | `install.sh` |
+| Modified | 2 | `README.md`, `docs/plans/0005_install-script.md` |
+
+### Execution Summary
+
+**Duration:** 2025-12-24 (single session)
+**Phases:** 2 phases, 3 tasks
+**Reviews:** 3 checkpoints passed (Phase 1, Phase 2, Final)
+
+Execution was straightforward. Codex review caught a missing value guard for `--preset` flag during final review, which was fixed before completion.
+
+### Lessons Learned
+
+**What Went Well:**
+- Plan was well-scoped and simple to execute
+- Codex CLI reviews caught edge case that manual review missed
+
+**Challenges:**
+- None significant
+
+**Recommendations:**
+- Bash scripts should include guards for all required flag values
+
+---
+
 # 0005_install-script
 
 **Status:** COMPLETE
