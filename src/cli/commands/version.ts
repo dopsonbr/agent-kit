@@ -3,10 +3,8 @@
  */
 
 import { print } from "../output";
-
-// Read version from package.json at build time
-const VERSION = "0.1.0";
+import pkg from "../../../package.json";
 
 export function versionCommand(): void {
-  print(`agent-kit v${VERSION}`);
+  print(`agent-kit v${pkg.version}`);
 }
