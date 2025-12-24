@@ -22,6 +22,7 @@
     "dev": "bun run --watch src/cli/index.ts",
     "build": "bun build src/cli/index.ts --outdir dist/cli --target node && bun build src/lib/index.ts --outdir dist/lib --target node",
     "build:standalone": "bun build src/cli/index.ts --compile --outfile dist/ak-darwin-arm64 --target bun-darwin-arm64",
+    "release": "bun scripts/release.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
