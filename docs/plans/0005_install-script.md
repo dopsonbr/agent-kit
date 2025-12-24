@@ -1,6 +1,6 @@
 # 0005_install-script
 
-**Status:** DRAFT
+**Status:** COMPLETE
 
 ---
 
@@ -121,13 +121,12 @@ fi
 
 info "Installing agent-kit..."
 
-# Build command
-CMD="npx agent-kit@latest init"
-[[ -n "$PRESET" ]] && CMD="$CMD --preset $PRESET"
-[[ -n "$YES_FLAG" ]] && CMD="$CMD $YES_FLAG"
-
-# Run installation
-eval "$CMD"
+# Run installation (avoid eval for security)
+if [[ -n "$PRESET" ]]; then
+  npx agent-kit@latest init --preset "$PRESET" $YES_FLAG
+else
+  npx agent-kit@latest init $YES_FLAG
+fi
 
 info "Done! Run 'ak help' to get started."
 ```
@@ -204,7 +203,10 @@ Interactive menu lets you select from logical groups:
 | `minimal` | Just AGENTS.md |
 | `claude` | Optimized for Claude Code |
 | `copilot` | Optimized for GitHub Copilot |
+| `codex` | Optimized for OpenAI Codex CLI |
 | `planning` | Focus on design and docs |
+| `review` | Focus on code review |
+| `execution` | Focus on autonomous execution |
 
 ```bash
 # Install with a specific preset
@@ -236,9 +238,8 @@ cat README.md | head -50
 
 ### Automated Tests
 
-| Type | What It Tests | Command |
-|------|---------------|---------|
-| Unit | Flag parsing | `bun test tests/install.test.ts` |
+No automated tests for `install.sh` — bash scripts are validated manually.
+The script delegates to `npx agent-kit init` which is tested in `tests/cli/init.test.ts`.
 
 **Note:** Full E2E testing requires npm publish. Manual validation is primary.
 
@@ -249,7 +250,7 @@ cat README.md | head -50
    chmod +x install.sh
    ./install.sh --preset minimal --yes
    ```
-   **Expected:** Creates `.claude/`, `AGENTS.md`, `.ak/config.json`
+   **Expected:** Creates `AGENTS.md`, `.ak/config.json` (minimal preset skips `.claude/`)
 
 2. **Test --all flag:**
    ```bash
@@ -314,10 +315,10 @@ git revert HEAD  # Revert README changes
 
 ## Checklist
 
-- [ ] Phase 1 complete
-- [ ] Phase 2 complete
-- [ ] Manual validation passed
-- [ ] README reflects reality
+- [x] Phase 1 complete
+- [x] Phase 2 complete
+- [ ] Manual validation passed (post-merge)
+- [x] README reflects reality
 
 ---
 
